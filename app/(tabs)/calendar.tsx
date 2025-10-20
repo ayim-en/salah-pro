@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Home</Text>
+        <Text style={styles.title}>Calendar</Text>
       </View>
     </View>
   );

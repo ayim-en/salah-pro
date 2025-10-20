@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Home() {
+export default function SettingsPrayerTimes() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Home</Text>
+        <Text style={styles.title}>Prayer Times</Text>
       </View>
     </View>
   );

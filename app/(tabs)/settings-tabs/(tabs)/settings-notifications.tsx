@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Home() {
+export default function SettingsNotifications() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Home</Text>
+        <Text style={styles.title}>Settings Notifications</Text>
       </View>
     </View>
   );
