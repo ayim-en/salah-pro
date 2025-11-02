@@ -5,6 +5,9 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarStyle: {
+          borderTopWidth: 0,
+        },
       }}
     >
       <Tabs.Screen
