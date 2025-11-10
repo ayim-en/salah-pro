@@ -7,7 +7,7 @@ const { width, height } = Dimensions.get("window");
 const pageHeight = height * 0.45;
 const pageWidth = width * 0.85;
 
-const Prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"] as const;
+const Prayers = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"] as const;
 
 const formatDate = (isoDate: string): string => {
   const date = new Date(isoDate);

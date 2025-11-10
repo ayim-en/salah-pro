@@ -1,6 +1,9 @@
-// Georgorian month prayer api types
+// Using Prayer times for a Gregorian month
+// get /calendar/{year}/{month} 
+
 export type Timings = {
     Fajr: string;
+    Sunrise: string;
     Dhuhr: string;
     Asr: string;
     Maghrib: string;
@@ -50,10 +53,10 @@ const gregorianDateToISO = (gregorianDate: string) => {
 export const transformPrayerDict = (dataArray: DayItem[]): PrayerDict => 
     dataArray.reduce<PrayerDict>((acc, item) => {
         const key = gregorianDateToISO(item.date.gregorian.date);
-        const { Fajr, Dhuhr, Asr, Maghrib, Isha } = item.timings; // Could add Sunrise here
+        const { Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha } = item.timings; // Could add Sunrise here
 
         acc[key] = {
-            timings: { Fajr, Dhuhr, Asr, Maghrib, Isha },
+            timings: { Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha },
             gregorianDate: item.date.gregorian.date,
             hijriDate: item.date.hijri.date,
             weekday: item.date.gregorian.weekday.en,
