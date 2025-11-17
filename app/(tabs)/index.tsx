@@ -1,7 +1,7 @@
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Dimensions, Image, Text, View } from "react-native";
-import { Carousel } from "react-native-ui-lib";
+import { Carousel, Icon } from "react-native-ui-lib";
 
 const { width, height } = Dimensions.get("window");
 const pageHeight = height * 0.45;
@@ -9,6 +9,17 @@ const pageWidth = width * 0.85;
 
 const Prayers = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"] as const;
 
+// Prayer icon mapping
+const prayerIcons: Record<(typeof Prayers)[number], any> = {
+  Fajr: require("../../assets/images/prayer-pro-icons/home-page/prayer-times/icon-fajr.png"),
+  Sunrise: require("../../assets/images/prayer-pro-icons/home-page/prayer-times/icon-sunrise.png"),
+  Dhuhr: require("../../assets/images/prayer-pro-icons/home-page/prayer-times/icon-dhuhr.png"),
+  Asr: require("../../assets/images/prayer-pro-icons/home-page/prayer-times/icon-asr.png"),
+  Maghrib: require("../../assets/images/prayer-pro-icons/home-page/prayer-times/icon-maghrib.png"),
+  Isha: require("../../assets/images/prayer-pro-icons/home-page/prayer-times/icon-isha.png"),
+};
+
+// Prayer Time Helpers
 const formatDate = (isoDate: string): string => {
   const date = new Date(isoDate);
   const options: Intl.DateTimeFormatOptions = {
@@ -161,7 +172,7 @@ export default function Index() {
               return (
                 <View
                   key={isoDate}
-                  className="w-full h-full rounded-xl p-4 justify-start"
+                  className="w-full h-full rounded-xl justify-start"
                 >
                   <View className="mb-4">
                     <Text className="text-xl font-bold text-black">
@@ -180,12 +191,26 @@ export default function Index() {
                         key={prayer}
                         className="flex-row justify-between items-center py-2"
                       >
-                        <Text className="text-base font-semibold text-gray-800">
-                          {prayer}
-                        </Text>
-                        <Text className="text-base text-gray-700">
-                          {cleanTimeString(dayPrayers.timings[prayer])}
-                        </Text>
+                        <View className="flex-row items-center gap-4">
+                          <Icon
+                            source={prayerIcons[prayer]}
+                            size={24}
+                            tintColor="#568FAF"
+                          />
+                          <Text className="text-base font-semibold text-gray-800">
+                            {prayer}
+                          </Text>
+                        </View>
+                        <View className="flex-row items-center gap-4">
+                          <Text className="text-base text-gray-700">
+                            {cleanTimeString(dayPrayers.timings[prayer])}
+                          </Text>
+                          <Icon
+                            source={require("../../assets/images/prayer-pro-icons/home-page/icon-notify-off.png")}
+                            size={24}
+                            tintColor="#568FAF"
+                          />
+                        </View>
                       </View>
                     ))}
                   </View>
