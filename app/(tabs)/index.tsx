@@ -146,9 +146,16 @@ export default function Index() {
         <Text className="font-extrabold text-white text-[80px]">
           {nextPrayer ? nextPrayer.time : "--:--"}
         </Text>
-        <Text className="text-sm font-bold text-white">Tokyo, Japan</Text>
+        <View className="flex-row items-center gap-1">
+          <Text className="text-sm font-bold text-white">Tokyo, Japan</Text>
+          <Icon
+            source={require("../../assets/images/prayer-pro-icons/home-page/icon-location.png")}
+            size={12}
+            tintColor="white"
+          />
+        </View>
       </View>
-      {/* //Todo: Replace With Current Location and Add compass icon*/}
+      {/* //Todo: Replace With Current Location */}
       <View
         className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
         style={{ height: height * 0.5 }}
