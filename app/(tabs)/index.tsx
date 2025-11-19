@@ -1,5 +1,6 @@
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
-import React, { useEffect, useMemo, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Dimensions, Image, Text, View } from "react-native";
 import { Carousel, Icon } from "react-native-ui-lib";
 
@@ -50,7 +51,10 @@ const getNextPrayer = (
   const todayPrayers = prayerDict[todayISO];
   if (!todayPrayers) return null;
 
-  for (const prayer of Prayers) {
+  // Removes Sunrise from the upcoming prayers logic
+  const fardPrayers = Prayers.filter((p) => p !== "Sunrise");
+
+  for (const prayer of fardPrayers) {
     const prayerTime = todayPrayers.timings[prayer];
     const prayerMinutes = prayerTimeToMinutes(prayerTime);
 
@@ -59,6 +63,7 @@ const getNextPrayer = (
     }
   }
 
+  // If no more prayers today, return Fajr of tomorrow
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -118,13 +123,31 @@ export default function Index() {
       ),
     [sortedDates, todayISO]
   );
-  const nextPrayer = useMemo(() => getNextPrayer(prayerDict), [prayerDict]);
+  const [nextPrayer, setNextPrayer] = useState<{
+    prayer: string;
+    time: string;
+  } | null>(null);
+
+  // Update nextPrayer when prayerDict changes and when prayer screen is focused
+  useEffect(() => {
+    if (Object.keys(prayerDict).length > 0) {
+      setNextPrayer(getNextPrayer(prayerDict));
+    }
+  }, [prayerDict]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Object.keys(prayerDict).length > 0) {
+        setNextPrayer(getNextPrayer(prayerDict));
+      }
+    }, [prayerDict])
+  );
 
   useEffect(() => {
     if (todayIndex > 0 && currentPage === 0) {
       setCurrentPage(todayIndex);
     }
-  }, [todayIndex]);
+  }, [todayIndex, currentPage]);
 
   if (loading) return <ActivityIndicator className="mt-12" />;
   if (error) return <Text className="color-red-600 m-4">{error}</Text>;
