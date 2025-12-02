@@ -1,7 +1,14 @@
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Dimensions, Image, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { Carousel, Icon } from "react-native-ui-lib";
 
 const { width, height } = Dimensions.get("window");
@@ -85,6 +92,9 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [notificationsEnabled, setNotificationsEnabled] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     (async () => {
@@ -148,6 +158,15 @@ export default function Index() {
       setCurrentPage(todayIndex);
     }
   }, [todayIndex, currentPage]);
+
+  // Prayer Notification Toggler
+  const toggleNotification = (prayer: string) => {
+    setNotificationsEnabled((prev) => {
+      const updated = { ...prev };
+      updated[prayer] = !updated[prayer];
+      return updated;
+    });
+  };
 
   if (loading) return <ActivityIndicator className="mt-12" />;
   if (error) return <Text className="color-red-600 m-4">{error}</Text>;
@@ -235,11 +254,17 @@ export default function Index() {
                           <Text className="text-base text-gray-700">
                             {cleanTimeString(dayPrayers.timings[prayer])}
                           </Text>
-                          <Icon
-                            source={require("../../assets/images/prayer-pro-icons/home-page/icon-notify-off.png")}
-                            size={24}
-                            tintColor="#568FAF"
-                          />
+                          <Pressable onPress={() => toggleNotification(prayer)}>
+                            <Icon
+                              source={
+                                notificationsEnabled[prayer]
+                                  ? require("../../assets/images/prayer-pro-icons/home-page/icon-notify-on.png")
+                                  : require("../../assets/images/prayer-pro-icons/home-page/icon-notify-off.png")
+                              }
+                              size={24}
+                              tintColor="#568FAF"
+                            />
+                          </Pressable>
                         </View>
                       </View>
                     ))}
