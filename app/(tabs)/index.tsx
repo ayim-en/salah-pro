@@ -1,8 +1,10 @@
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { useFocusEffect } from "@react-navigation/native";
+import * as Location from "expo-location";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   Image,
   Pressable,
@@ -95,6 +97,9 @@ export default function Index() {
   const [notificationsEnabled, setNotificationsEnabled] = useState<
     Record<string, boolean>
   >({});
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null
+  );
 
   useEffect(() => {
     (async () => {
@@ -120,10 +125,32 @@ export default function Index() {
   }, []);
   // TODO: Replace Temp API Call w/ proper implementation
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setError("Permission to access location was denied");
+        return;
+      }
+    })();
+  }, []);
+
+  const getCurrentLocation = async () => {
+    try {
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    } catch {
+      Alert.alert("Error", "Could not fetch current location");
+    }
+  };
+
+  // Sort prayerDict dates in chronological order
   const sortedDates = useMemo(
     () => Object.keys(prayerDict).sort(),
     [prayerDict]
   );
+
+  // Find index of today's date using ISO string
   const todayISO = new Date().toISOString().slice(0, 10);
   const todayIndex = useMemo(
     () =>
@@ -133,18 +160,21 @@ export default function Index() {
       ),
     [sortedDates, todayISO]
   );
+
+  // State that holds the next upcoming prayer and its time
   const [nextPrayer, setNextPrayer] = useState<{
     prayer: string;
     time: string;
   } | null>(null);
 
-  // Update nextPrayer when prayerDict changes and when prayer screen is focused
+  // Update nextPrayer when prayerDict changes
   useEffect(() => {
     if (Object.keys(prayerDict).length > 0) {
       setNextPrayer(getNextPrayer(prayerDict));
     }
   }, [prayerDict]);
 
+  // Update nextPrayer when prayer screen is focused
   useFocusEffect(
     useCallback(() => {
       if (Object.keys(prayerDict).length > 0) {
@@ -153,6 +183,7 @@ export default function Index() {
     }, [prayerDict])
   );
 
+  // Set current page to today when initially loaded
   useEffect(() => {
     if (todayIndex > 0 && currentPage === 0) {
       setCurrentPage(todayIndex);

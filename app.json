@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.ayimen.salah-pro",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show accurate prayer times for your area."
       }
     },
     "android": {
@@ -24,7 +25,11 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ayimen.salahpro"
+      "package": "com.ayimen.salahpro",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
@@ -44,8 +49,16 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Salah Pro to use your location to show accurate prayer times for your area.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
+        }
       ]
-    ],
+    ], 
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
