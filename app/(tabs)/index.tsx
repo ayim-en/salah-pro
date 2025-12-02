@@ -4,7 +4,6 @@ import * as Location from "expo-location";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   Image,
   Pressable,
@@ -101,17 +100,29 @@ export default function Index() {
     null
   );
 
+  // Fetches current location then prayer times on mount
   useEffect(() => {
     (async () => {
       try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setError("Permission to access location was denied");
+          setLoading(false);
+          return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+
+        // built off the Prayer times for a Gregorian month API
         const baseUrl = "https://api.aladhan.com/v1/";
         const now = new Date();
         const year = now.getFullYear();
         const month = now.getMonth() + 1;
 
         const data = await getPrayerDict(baseUrl, year, month, {
-          latitude: 47.6062,
-          longitude: -122.3321,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
           method: 2,
           school: 0,
         });
@@ -123,28 +134,8 @@ export default function Index() {
       }
     })();
   }, []);
-  // TODO: Replace Temp API Call w/ proper implementation
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setError("Permission to access location was denied");
-        return;
-      }
-    })();
-  }, []);
-
-  const getCurrentLocation = async () => {
-    try {
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    } catch {
-      Alert.alert("Error", "Could not fetch current location");
-    }
-  };
-
-  // Sort prayerDict dates in chronological order
+  // Sort prayerDict dates in numerical order which is chronological for ISO strings
   const sortedDates = useMemo(
     () => Object.keys(prayerDict).sort(),
     [prayerDict]
