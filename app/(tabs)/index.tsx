@@ -99,8 +99,11 @@ export default function Index() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
+  const [locationName, setLocationName] = useState<string>(
+    "Loading location..."
+  );
 
-  // Fetches current location then prayer times on mount
+  // Fetches current location on mount
   useEffect(() => {
     (async () => {
       try {
@@ -111,10 +114,22 @@ export default function Index() {
           return;
         }
 
-        let location = await Location.getCurrentPositionAsync({});
-        setLocation(location);
+        let userLocation = await Location.getCurrentPositionAsync({});
+        setLocation(userLocation);
+      } catch (err: any) {
+        setError("Failed to get location");
+        setLoading(false);
+      }
+    })();
+  }, []);
 
-        // built off the Prayer times for a Gregorian month API
+  // Fetches prayer times when location changes
+  useEffect(() => {
+    if (!location) return;
+
+    (async () => {
+      try {
+        // based off Prayer times for a Gregorian month API
         const baseUrl = "https://api.aladhan.com/v1/";
         const now = new Date();
         const year = now.getFullYear();
@@ -133,15 +148,36 @@ export default function Index() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [location]);
 
-  // Sort prayerDict dates in numerical order which is chronological for ISO strings
+  // Uses location data to get city and country name
+  useEffect(() => {
+    if (!location) return;
+
+    (async () => {
+      try {
+        const reverseGeocode = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+
+        if (reverseGeocode.length > 0) {
+          const { city, country } = reverseGeocode[0];
+          setLocationName(`${city || "Unknown"}, ${country || "Unknown"}`);
+        }
+      } catch (err) {
+        setLocationName("Location unavailable");
+      }
+    })();
+  }, [location]);
+
+  // Sorts prayerDict dates in numerical order which is chronological for ISO strings
   const sortedDates = useMemo(
     () => Object.keys(prayerDict).sort(),
     [prayerDict]
   );
 
-  // Find index of today's date using ISO string
+  // Finds index of today's date using ISO string
   const todayISO = new Date().toISOString().slice(0, 10);
   const todayIndex = useMemo(
     () =>
@@ -158,14 +194,14 @@ export default function Index() {
     time: string;
   } | null>(null);
 
-  // Update nextPrayer when prayerDict changes
+  // Updates nextPrayer when prayerDict changes
   useEffect(() => {
     if (Object.keys(prayerDict).length > 0) {
       setNextPrayer(getNextPrayer(prayerDict));
     }
   }, [prayerDict]);
 
-  // Update nextPrayer when prayer screen is focused
+  // Updates nextPrayer when prayer screen is focused
   useFocusEffect(
     useCallback(() => {
       if (Object.keys(prayerDict).length > 0) {
@@ -174,7 +210,7 @@ export default function Index() {
     }, [prayerDict])
   );
 
-  // Set current page to today when initially loaded
+  // Sets current page to today when initially loaded
   useEffect(() => {
     if (todayIndex > 0 && currentPage === 0) {
       setCurrentPage(todayIndex);
@@ -211,7 +247,7 @@ export default function Index() {
           {nextPrayer ? nextPrayer.time : "--:--"}
         </Text>
         <View className="flex-row items-center gap-1">
-          <Text className="text-sm font-bold text-white">Tokyo, Japan</Text>
+          <Text className="text-sm font-bold text-white">{locationName}</Text>
           <Icon
             source={require("../../assets/images/prayer-pro-icons/home-page/icon-location.png")}
             size={12}
@@ -219,7 +255,6 @@ export default function Index() {
           />
         </View>
       </View>
-      {/* //Todo: Replace With Current Location */}
       <View
         className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
         style={{ height: height * 0.5 }}
