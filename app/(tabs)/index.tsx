@@ -1,6 +1,7 @@
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
+import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -231,11 +232,13 @@ export default function Index() {
 
   return (
     <View className="flex-1 bg-blue-500">
+      <StatusBar style="light" />
+      {/*// TODO: will change depending on upcoming prayer */}
       <Image
         source={require("../../assets/images/prayer-pro-bg/prayer-pro-bg-fajr.png")}
         className="absolute -top-[200]  left-0 w-full h-full"
       />
-      {/* //TODO: background will change depending on upcoming prayer*/}
+      {/* //TODO: background will change depending on upcoming prayer */}
 
       <View className="absolute left-0 right-0 justify-center items-center pt-24 mb-14">
         <Text className=" font-bold text-sm text-white">

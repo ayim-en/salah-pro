@@ -13,6 +13,7 @@ export default function TabLayout() {
         },
         tabBarActiveTintColor: "#568FAF",
         tabBarInactiveTintColor: "#8398a3",
+        // TODO: update color tint based on upcoming prayer
       }}
     >
       <Tabs.Screen
