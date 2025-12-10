@@ -9,12 +9,16 @@ export default function SettingsHome() {
         <Text className="text-6xl font-bold">Settings</Text>
       </View>
       <Button
-        title="Go to Notifications"
+        title="Notifications Settings"
         onPress={() => router.navigate("/settings-tabs/settings-notifications")}
       />
       <Button
-        title="Go to Prayer Times"
+        title="Prayer Times Settings"
         onPress={() => router.navigate("/settings-tabs/settings-prayer-times")}
+      />
+      <Button
+        title="Carousel Settings"
+        onPress={() => router.navigate("/settings-tabs/settings-carousel")}
       />
     </View>
   );
