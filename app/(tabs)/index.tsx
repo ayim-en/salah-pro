@@ -1,5 +1,6 @@
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -103,6 +104,20 @@ export default function Index() {
   const [locationName, setLocationName] = useState<string>(
     "Loading location..."
   );
+
+  // Load notification states from AsyncStorage on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const savedNotifications = await AsyncStorage.getItem("prayerNotifications");
+        if (savedNotifications) {
+          setNotificationsEnabled(JSON.parse(savedNotifications));
+        }
+      } catch (error) {
+        console.error("Failed to load notification settings:", error);
+      }
+    })();
+  }, []);
 
   // Fetches current location on mount
   useEffect(() => {
@@ -219,10 +234,16 @@ export default function Index() {
   }, [todayIndex, currentPage]);
 
   // Prayer Notification Toggler
-  const toggleNotification = (prayer: string) => {
+  const toggleNotification = async (prayer: string) => {
     setNotificationsEnabled((prev) => {
       const updated = { ...prev };
       updated[prayer] = !updated[prayer];
+      
+      // Save to AsyncStorage
+      AsyncStorage.setItem("prayerNotifications", JSON.stringify(updated)).catch(
+        (error: any) => console.error("Failed to save notification settings:", error)
+      );
+      
       return updated;
     });
   };
