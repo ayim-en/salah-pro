@@ -3,7 +3,7 @@ import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { cleanTimeString, formatDate } from "@/utils/prayerHelpers";
 import React from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
-import { Carousel, Icon } from "react-native-ui-lib";
+import { Carousel, Colors, Icon } from "react-native-ui-lib";
 
 const { width, height } = Dimensions.get("window");
 const pageHeight = height * 0.45;
@@ -57,7 +57,10 @@ export const PrayerCarousel = ({
                     {formatDate(isoDate)}
                   </Text>
                   {isToday && (
-                    <Text className="text-xs font-semibold text-[#568FAF] mt-1">
+                    <Text
+                      className="text-xs font-semibold mt-1"
+                      style={{ color: Colors.tabActive }}
+                    >
                       TODAY
                     </Text>
                   )}
@@ -73,7 +76,7 @@ export const PrayerCarousel = ({
                         <Icon
                           source={prayerIcons[prayer]}
                           size={24}
-                          tintColor="#568FAF"
+                          tintColor={Colors.tabActive}
                         />
                         <Text className="text-base font-semibold text-gray-800">
                           {prayer}
@@ -91,7 +94,7 @@ export const PrayerCarousel = ({
                                 : require("../assets/images/prayer-pro-icons/home-page/icon-notify-off.png")
                             }
                             size={24}
-                            tintColor="#568FAF"
+                            tintColor={Colors.tabActive}
                           />
                         </Pressable>
                       </View>

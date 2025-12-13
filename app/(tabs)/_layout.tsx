@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Icon } from "react-native-ui-lib";
+import { Colors, Icon } from "react-native-ui-lib";
 
 export default function TabLayout() {
   return (
@@ -11,13 +11,11 @@ export default function TabLayout() {
         tabBarStyle: {
           borderTopWidth: 0,
         },
-        tabBarActiveTintColor: "#568FAF",
-        tabBarInactiveTintColor: "#8398a3",
-        // TODO: update color tint based on upcoming prayer
+        tabBarActiveTintColor: Colors.tabActive,
+        tabBarInactiveTintColor: Colors.tabInactive,
       }}
     >
       <Tabs.Screen
-        // TODO: change tabBackgroundImage to be based on upcoming prayer
         name="index"
         options={{
           headerShown: false,
@@ -26,13 +24,11 @@ export default function TabLayout() {
               source={require("../../assets/images/prayer-pro-icons/bottom-tab/icon-home.png")}
               size={size}
               tintColor={color}
-              // TODO: update color of icon based on upcoming prayer
             />
           ),
         }}
       />
       <Tabs.Screen
-        // TODO: change tabBackgroundImage to be based on upcoming prayer
         name="qibla"
         options={{
           headerShown: false,
@@ -74,3 +70,4 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+

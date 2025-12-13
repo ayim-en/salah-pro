@@ -29,3 +29,31 @@ export const prayerBackgrounds: Record<string, any> = {
   Maghrib: require("../assets/images/prayer-pro-bg/prayer-pro-bg-maghrib.png"),
   Isha: require("../assets/images/prayer-pro-bg/prayer-pro-bg-isha.png"),
 };
+
+// Theme colors for each prayer (active and inactive states)
+export const prayerThemeColors = {
+  Fajr: {
+    active: "#568FAF",
+    inactive: "#7BA8CC",
+  },
+  Sunrise: {
+    active: "#ff9a13",
+    inactive: "#fd8211",
+  },
+  Dhuhr: {
+    active: "#55bddf",
+    inactive: "#78d0e8",
+  },
+  Asr: {
+    active: "#ffc77a",
+    inactive: "#ff9a13",
+  },
+  Maghrib: {
+    active: "#9B59B6",
+    inactive: "#C39BD3",
+  },
+  Isha: {
+    active: "#532e70",
+    inactive: "#854ab4",
+  },
+};

@@ -1,11 +1,13 @@
 import { PrayerCarousel } from "@/components/PrayerCarousel";
 import { UpcomingPrayerHeader } from "@/components/UpcomingPrayerHeader";
+import { prayerThemeColors } from "@/constants/prayers";
 import { useLocation } from "@/hooks/useLocation";
 import { useNotifications } from "@/hooks/useNotifications";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { Colors } from "react-native-ui-lib";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -32,6 +34,20 @@ export default function Index() {
     }
   }, [todayIndex, currentPage]);
 
+  // Update theme colors based on upcoming prayer
+  useEffect(() => {
+    if (nextPrayer?.prayer) {
+      const prayerName = nextPrayer.prayer as keyof typeof prayerThemeColors;
+      const colors = prayerThemeColors[prayerName];
+      if (colors) {
+        Colors.loadColors({
+          tabActive: colors.active,
+          tabInactive: colors.inactive,
+        });
+      }
+    }
+  }, [nextPrayer]);
+
   if (loading) return <ActivityIndicator className="mt-12" />;
   if (error) return <Text className="color-red-600 m-4">{error}</Text>;
 
@@ -39,6 +55,7 @@ export default function Index() {
     <View className="flex-1 bg-blue-500">
       <StatusBar style="light" />
       <UpcomingPrayerHeader
+        key={nextPrayer?.prayer}
         nextPrayer={nextPrayer}
         locationName={locationName}
       />

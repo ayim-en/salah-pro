@@ -22,6 +22,7 @@ export const UpcomingPrayerHeader = ({
   return (
     <>
       <Image
+        key={nextPrayer?.prayer}
         source={backgroundImage}
         className="absolute -top-[200]  left-0 w-full h-full"
       />

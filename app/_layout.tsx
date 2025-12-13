@@ -7,6 +7,8 @@ Colors.loadColors({
   primary: "#3B82F6",
   background: "#FFFFFF",
   text: "#111",
+  tabActive: "#568FAF",
+  tabInactive: "#8398a3",
 });
 
 Typography.loadTypographies({
