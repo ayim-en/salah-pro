@@ -1,5 +1,7 @@
+import React from "react";
 import { Dimensions, Image, Text, View } from "react-native";
 import { Icon } from "react-native-ui-lib";
+import { prayerBackgrounds } from "../constants/prayers";
 
 const { height } = Dimensions.get("window");
 
@@ -12,13 +14,17 @@ export const UpcomingPrayerHeader = ({
   nextPrayer,
   locationName,
 }: UpcomingPrayerHeaderProps) => {
+  // Get the background image based on the upcoming prayer
+  const backgroundImage = nextPrayer?.prayer
+    ? prayerBackgrounds[nextPrayer.prayer] || prayerBackgrounds.Fajr
+    : prayerBackgrounds.Fajr;
+
   return (
     <>
       <Image
-        source={require("../assets/images/prayer-pro-bg/prayer-pro-bg-fajr.png")}
+        source={backgroundImage}
         className="absolute -top-[200]  left-0 w-full h-full"
       />
-      {/* //TODO: background will change depending on upcoming prayer */}
 
       <View className="absolute left-0 right-0 justify-center items-center pt-24 mb-14">
         <Text className=" font-bold text-sm text-white">
