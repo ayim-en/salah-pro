@@ -63,3 +63,28 @@ export const getNextPrayer = (
 
   return null;
 };
+
+// Convert degrees to cardinal direction (N, NE, E, SE, S, SW, W, NW)
+export const getCardinalDirection = (degrees: number): string => {
+  const normalizedDegrees = ((degrees % 360) + 360) % 360;
+
+  const directions = [
+    { name: "N", min: 337.5, max: 360 },
+    { name: "N", min: 0, max: 22.5 },
+    { name: "NE", min: 22.5, max: 67.5 },
+    { name: "E", min: 67.5, max: 112.5 },
+    { name: "SE", min: 112.5, max: 157.5 },
+    { name: "S", min: 157.5, max: 202.5 },
+    { name: "SW", min: 202.5, max: 247.5 },
+    { name: "W", min: 247.5, max: 292.5 },
+    { name: "NW", min: 292.5, max: 337.5 },
+  ];
+
+  for (const dir of directions) {
+    if (normalizedDegrees >= dir.min && normalizedDegrees < dir.max) {
+      return dir.name;
+    }
+  }
+
+  return "N";
+};
