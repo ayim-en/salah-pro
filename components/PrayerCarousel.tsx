@@ -3,7 +3,7 @@ import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { cleanTimeString, formatDate } from "@/utils/prayerHelpers";
 import React from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
-import { Carousel, Colors, Icon } from "react-native-ui-lib";
+import { Carousel, Icon } from "react-native-ui-lib";
 
 const { width, height } = Dimensions.get("window");
 const pageHeight = height * 0.45;
@@ -18,6 +18,7 @@ interface PrayerCarouselProps {
   onPageChange: (page: number) => void;
   notificationsEnabled: Record<string, boolean>;
   onToggleNotification: (prayer: string) => void;
+  activeColor: string;
 }
 
 export const PrayerCarousel = ({
@@ -29,6 +30,7 @@ export const PrayerCarousel = ({
   onPageChange,
   notificationsEnabled,
   onToggleNotification,
+  activeColor,
 }: PrayerCarouselProps) => {
   return (
     <View className="pt-64 items-center mt-40 mb-12">
@@ -59,7 +61,7 @@ export const PrayerCarousel = ({
                   {isToday && (
                     <Text
                       className="text-xs font-semibold mt-1"
-                      style={{ color: Colors.tabActive }}
+                      style={{ color: activeColor }}
                     >
                       TODAY
                     </Text>
@@ -76,7 +78,7 @@ export const PrayerCarousel = ({
                         <Icon
                           source={prayerIcons[prayer]}
                           size={24}
-                          tintColor={Colors.tabActive}
+                          tintColor={activeColor}
                         />
                         <Text className="text-base font-semibold text-gray-800">
                           {prayer}
@@ -94,7 +96,7 @@ export const PrayerCarousel = ({
                                 : require("../assets/images/prayer-pro-icons/home-page/icon-notify-off.png")
                             }
                             size={24}
-                            tintColor={Colors.tabActive}
+                            tintColor={activeColor}
                           />
                         </Pressable>
                       </View>

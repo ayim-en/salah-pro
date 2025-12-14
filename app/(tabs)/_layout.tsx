@@ -1,8 +1,10 @@
+import { useThemeColors } from "@/context/ThemeContext";
 import { Tabs } from "expo-router";
 import React from "react";
-import { Colors, Icon } from "react-native-ui-lib";
+import { Icon } from "react-native-ui-lib";
 
 export default function TabLayout() {
+  const { colors } = useThemeColors();
   return (
     <Tabs
       screenOptions={{
@@ -11,8 +13,8 @@ export default function TabLayout() {
         tabBarStyle: {
           borderTopWidth: 0,
         },
-        tabBarActiveTintColor: Colors.tabActive,
-        tabBarInactiveTintColor: Colors.tabInactive,
+        tabBarActiveTintColor: colors.active,
+        tabBarInactiveTintColor: colors.inactive,
       }}
     >
       <Tabs.Screen
@@ -70,4 +72,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-

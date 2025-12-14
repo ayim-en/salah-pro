@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/context/ThemeContext";
 import { Stack } from "expo-router";
 import React from "react";
 import { Colors, Spacings, Typography } from "react-native-ui-lib";
@@ -22,5 +23,9 @@ Spacings.loadSpacings({
 });
 
 export default function RootLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <ThemeProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </ThemeProvider>
+  );
 }

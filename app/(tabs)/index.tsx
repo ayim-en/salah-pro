@@ -1,16 +1,17 @@
 import { PrayerCarousel } from "@/components/PrayerCarousel";
 import { UpcomingPrayerHeader } from "@/components/UpcomingPrayerHeader";
 import { prayerThemeColors } from "@/constants/prayers";
+import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
 import { useNotifications } from "@/hooks/useNotifications";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { Colors } from "react-native-ui-lib";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(0);
+  const { setColors } = useThemeColors();
 
   // Custom hooks to get states
   const { location, locationName, error: locationError } = useLocation();
@@ -40,13 +41,13 @@ export default function Index() {
       const prayerName = nextPrayer.prayer as keyof typeof prayerThemeColors;
       const colors = prayerThemeColors[prayerName];
       if (colors) {
-        Colors.loadColors({
-          tabActive: colors.active,
-          tabInactive: colors.inactive,
+        setColors({
+          active: colors.active,
+          inactive: colors.inactive,
         });
       }
     }
-  }, [nextPrayer]);
+  }, [nextPrayer, setColors]);
 
   if (loading) return <ActivityIndicator className="mt-12" />;
   if (error) return <Text className="color-red-600 m-4">{error}</Text>;
@@ -68,6 +69,13 @@ export default function Index() {
         onPageChange={setCurrentPage}
         notificationsEnabled={notificationsEnabled}
         onToggleNotification={toggleNotification}
+        activeColor={
+          nextPrayer?.prayer
+            ? prayerThemeColors[
+                nextPrayer.prayer as keyof typeof prayerThemeColors
+              ]?.active || "#568FAF"
+            : "#568FAF"
+        }
       />
     </View>
   );
