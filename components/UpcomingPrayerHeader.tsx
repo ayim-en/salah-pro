@@ -24,7 +24,8 @@ export const UpcomingPrayerHeader = ({
       <Image
         key={nextPrayer?.prayer}
         source={backgroundImage}
-        className="absolute -top-[200]  left-0 w-full h-full"
+        className="absolute -top-[200] left-0 w-full h-full"
+        resizeMode="cover"
       />
 
       <View className="absolute left-0 right-0 justify-center items-center pt-24 mb-14">

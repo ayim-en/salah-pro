@@ -1,3 +1,6 @@
+// Using Qibla direction
+// get /qibla/{latitude}/{longitude}
+
 export interface QiblaData {
   latitude: number;
   longitude: number;
