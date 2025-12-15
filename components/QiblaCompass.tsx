@@ -1,5 +1,6 @@
+import { useThemeColors } from "@/context/ThemeContext";
 import React from "react";
-import { Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
 
 interface QiblaCompassProps {
   magnetometer: number;
@@ -10,13 +11,11 @@ export const QiblaCompass = ({
   magnetometer,
   qiblaDirection,
 }: QiblaCompassProps) => {
-  // Calculate the rotation needed to point to Qibla
-  const getQiblaRotation = () => {
-    return qiblaDirection - magnetometer;
-  };
+  // Arrow stays fixed; compass and Kaaba marker handle rotation.
+  const { colors } = useThemeColors();
 
   return (
-    <View className="w-80 h-80 items-center justify-center">
+    <View className="w-96 h-96 items-center justify-center">
       {/* Compass Circle */}
       <View
         // TODO: Change border color based on upcoming prayer
@@ -27,38 +26,48 @@ export const QiblaCompass = ({
       >
         {/* // TODO: Change North Marker based on upcoming prayer */}
         <View className="absolute top-2">
-          <Text className="text-2xl font-bold text-red-500">N</Text>
+          <Text className="text-3xl font-bold text-red-500">N</Text>
         </View>
 
         {/* Cardinal Directions */}
         <View className="absolute right-2">
-          <Text className="text-lg font-bold text-gray-700">E</Text>
+          <Text className="text-3xl font-bold text-gray-700">E</Text>
         </View>
         <View className="absolute bottom-2">
-          <Text className="text-lg font-bold text-gray-700">S</Text>
+          <Text className="text-3xl font-bold text-gray-700">S</Text>
         </View>
         <View className="absolute left-2">
-          <Text className="text-lg font-bold text-gray-700">W</Text>
+          <Text className="text-3xl font-bold text-gray-700">W</Text>
+        </View>
+
+        {/* Qibla marker relative to North (rotates with the compass) */}
+        <View
+          className="absolute inset-0 items-center justify-center"
+          style={{ transform: [{ rotate: `${qiblaDirection}deg` }] }}
+        >
+          <Image
+            source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-kaaba.png")}
+            className="w-10 h-10"
+            style={{
+              tintColor: colors.active,
+              transform: [{ translateY: -140 }],
+            }}
+            resizeMode="contain"
+          />
         </View>
       </View>
 
-      {/* Qibla Arrow */}
-      <View
-        className="absolute items-center"
-        style={{
-          transform: [{ rotate: `${getQiblaRotation()}deg` }],
-        }}
-      >
-        <View className="w-1 h-32 bg-green-600" />
-        <View
-          // TODO: Change arrow color based on upcoming prayer
-          className="w-0 h-0 border-l-8 border-r-8 border-t-16"
+      {/* Fixed Qibla Arrow (does not rotate; always points up) */}
+      <View className="absolute inset-0 items-center justify-center">
+        <Image
+          // Qibla compass arrow icon; centered with tip facing upward
+          source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-arrow.png")}
+          className="w-14 h-14"
           style={{
-            borderLeftColor: "transparent",
-            borderRightColor: "transparent",
-            borderTopColor: "#16a34a",
-            borderTopWidth: 20,
+            tintColor: colors.active,
+            transform: [{ rotate: "180deg" }],
           }}
+          resizeMode="contain"
         />
       </View>
     </View>
