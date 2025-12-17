@@ -6,9 +6,10 @@ import { useDeviceHeading } from "@/hooks/useDeviceHeading";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { useQiblaDirection } from "@/hooks/useQiblaDirection";
+import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { ActivityIndicator, Text, Vibration, View } from "react-native";
 
 export default function Qibla() {
   const { location, locationName, error: locationError } = useLocation();
@@ -16,8 +17,36 @@ export default function Qibla() {
   const { nextPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
   const { colors } = useThemeColors();
+  const isFacingKaabaRef = useRef(false);
+  const isFocused = useIsFocused();
 
   const error = locationError || qiblaError;
+
+  // Vibration only when on qibla tab
+  useEffect(() => {
+    if (!isFocused) {
+      isFacingKaabaRef.current = false;
+      return;
+    }
+
+    if (!qiblaData || deviceHeading === null) return;
+
+    // Calculate relative angle from device heading to Kaaba
+    let relativeAngle = qiblaData.direction - deviceHeading;
+    // Normalize to -180 to 180 range
+    relativeAngle = ((relativeAngle + 180) % 360) - 180;
+
+    // Check if facing the Kaaba
+    const isFacingKaaba = Math.abs(relativeAngle) < 2.5;
+
+    // Trigger vibration when transitioning to facing Kaaba
+    if (isFacingKaaba && !isFacingKaabaRef.current) {
+      Vibration.vibrate([0, 100, 50, 100]); // Pattern: delay, vibrate, delay, vibrate
+      isFacingKaabaRef.current = true;
+    } else if (!isFacingKaaba && isFacingKaabaRef.current) {
+      isFacingKaabaRef.current = false;
+    }
+  }, [isFocused, qiblaData, deviceHeading]);
 
   // Get the background image based on the upcoming prayer
   const backgroundImage = nextPrayer?.prayer
