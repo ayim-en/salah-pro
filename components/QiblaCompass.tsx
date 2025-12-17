@@ -11,22 +11,30 @@ export const QiblaCompass = ({
   magnetometer,
   qiblaDirection,
 }: QiblaCompassProps) => {
-  // Arrow stays fixed; compass and Kaaba marker handle rotation.
   const { colors } = useThemeColors();
+
+  // Calculate Kaaba icon position based on qiblaDirection
+  // The icon should be positioned at the rim of the compass (radius ~140px)
+  const radius = 140;
+  const radians = (qiblaDirection * Math.PI) / 180;
+  const translateX = Math.sin(radians) * radius;
+  const translateY = -Math.cos(radians) * radius; // negative because Y increases downward
 
   return (
     <View className="w-96 h-96 items-center justify-center">
       {/* Compass Circle */}
       <View
-        // TODO: Change border color based on upcoming prayer
-        className="w-full h-full rounded-full border-8 border-gray-300 items-center justify-center bg-gray-50"
+        className="w-full h-full rounded-full border-8 items-center justify-center bg-gray-50"
         style={{
           transform: [{ rotate: `${-magnetometer}deg` }],
+          borderColor: colors.inactive,
         }}
       >
-        {/* // TODO: Change North Marker based on upcoming prayer */}
+        {/* North Marker */}
         <View className="absolute top-2">
-          <Text className="text-3xl font-bold text-red-500">N</Text>
+          <Text className="text-3xl font-bold" style={{ color: colors.active }}>
+            N
+          </Text>
         </View>
 
         {/* Cardinal Directions */}
@@ -40,17 +48,18 @@ export const QiblaCompass = ({
           <Text className="text-3xl font-bold text-gray-700">W</Text>
         </View>
 
-        {/* Qibla marker relative to North (rotates with the compass) */}
+        {/* Qibla marker - positioned based on qiblaDirection */}
         <View
           className="absolute inset-0 items-center justify-center"
-          style={{ transform: [{ rotate: `${qiblaDirection}deg` }] }}
+          style={{
+            transform: [{ translateX }, { translateY }],
+          }}
         >
           <Image
             source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-kaaba.png")}
             className="w-10 h-10"
             style={{
-              tintColor: colors.active,
-              transform: [{ translateY: -140 }],
+              tintColor: colors.inactive,
             }}
             resizeMode="contain"
           />
@@ -60,12 +69,11 @@ export const QiblaCompass = ({
       {/* Fixed Qibla Arrow (does not rotate; always points up) */}
       <View className="absolute inset-0 items-center justify-center">
         <Image
-          // Qibla compass arrow icon; centered with tip facing upward
           source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-arrow.png")}
           className="w-14 h-14"
           style={{
             tintColor: colors.active,
-            transform: [{ rotate: "180deg" }],
+            transform: [{ rotate: "180deg" }], // Arrow icon points down
           }}
           resizeMode="contain"
         />
