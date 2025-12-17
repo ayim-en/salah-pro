@@ -1,3 +1,4 @@
+import type { PrayerCarouselRef } from "@/components/PrayerCarousel";
 import { PrayerCarousel } from "@/components/PrayerCarousel";
 import { UpcomingPrayerHeader } from "@/components/UpcomingPrayerHeader";
 import { prayerThemeColors } from "@/constants/prayers";
@@ -5,12 +6,16 @@ import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
 import { useNotifications } from "@/hooks/useNotifications";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
+import { useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(0);
+  const [hasSetInitialPage, setHasSetInitialPage] = useState(false);
+  const carouselRef = useRef<PrayerCarouselRef>(null);
+  const navigation = useNavigation<any>();
   const { setColors } = useThemeColors();
 
   // Custom hooks to get states
@@ -28,12 +33,29 @@ export default function Index() {
 
   const error = locationError || prayerError;
 
-  // Sets current page to today when initially loaded
-  useEffect(() => {
-    if (todayIndex > 0 && currentPage === 0) {
+  const scrollToToday = useCallback(() => {
+    if (todayIndex >= 0 && currentPage !== todayIndex) {
+      carouselRef.current?.goToPage(todayIndex, true);
       setCurrentPage(todayIndex);
     }
-  }, [todayIndex, currentPage]);
+  }, [currentPage, todayIndex]);
+
+  // Sets current page to today when initially loaded
+  useEffect(() => {
+    if (!hasSetInitialPage && todayIndex >= 0) {
+      scrollToToday();
+      setHasSetInitialPage(true);
+    }
+  }, [hasSetInitialPage, scrollToToday, todayIndex]);
+
+  // Jump back to today when the Home tab is pressed
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("tabPress", () => {
+      scrollToToday();
+    });
+
+    return unsubscribe;
+  }, [navigation, scrollToToday]);
 
   // Update theme colors based on upcoming prayer
   useEffect(() => {
@@ -61,6 +83,7 @@ export default function Index() {
         locationName={locationName}
       />
       <PrayerCarousel
+        ref={carouselRef}
         prayerDict={prayerDict}
         sortedDates={sortedDates}
         todayISO={todayISO}

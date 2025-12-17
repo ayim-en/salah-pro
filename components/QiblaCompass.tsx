@@ -14,7 +14,6 @@ export const QiblaCompass = ({
   const { colors } = useThemeColors();
 
   // Calculate Kaaba icon position based on qiblaDirection
-  // The icon should be positioned at the rim of the compass (radius ~140px)
   const radius = 140;
   const radians = (qiblaDirection * Math.PI) / 180;
   const translateX = Math.sin(radians) * radius;
@@ -22,7 +21,6 @@ export const QiblaCompass = ({
 
   return (
     <View className="w-96 h-96 items-center justify-center">
-      {/* Compass Circle */}
       <View
         className="w-full h-full rounded-full border-8 items-center justify-center bg-gray-50"
         style={{
@@ -30,14 +28,12 @@ export const QiblaCompass = ({
           borderColor: colors.inactive,
         }}
       >
-        {/* North Marker */}
         <View className="absolute top-2">
           <Text className="text-3xl font-bold" style={{ color: colors.active }}>
             N
           </Text>
         </View>
 
-        {/* Cardinal Directions */}
         <View className="absolute right-2">
           <Text className="text-3xl font-bold text-gray-700">E</Text>
         </View>
@@ -48,7 +44,6 @@ export const QiblaCompass = ({
           <Text className="text-3xl font-bold text-gray-700">W</Text>
         </View>
 
-        {/* Qibla marker - positioned based on qiblaDirection */}
         <View
           className="absolute inset-0 items-center justify-center"
           style={{
@@ -66,7 +61,6 @@ export const QiblaCompass = ({
         </View>
       </View>
 
-      {/* Fixed Qibla Arrow (does not rotate; always points up) */}
       <View className="absolute inset-0 items-center justify-center">
         <Image
           source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-arrow.png")}
