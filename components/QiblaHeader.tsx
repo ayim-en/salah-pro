@@ -46,7 +46,7 @@ export const QiblaHeader = ({
               {locationName}
             </Text>
           )}
-          <Text className=" font-bold text-sm text-white">
+          <Text className=" font-bold text-sm text-white pt-3">
             {nextPrayer
               ? `Upcoming Prayer: ${nextPrayer.prayer}`
               : "Loading upcoming prayer..."}

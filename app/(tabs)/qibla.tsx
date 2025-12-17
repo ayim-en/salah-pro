@@ -1,6 +1,7 @@
 import { QiblaCompass } from "@/components/QiblaCompass";
 import { QiblaHeader } from "@/components/QiblaHeader";
 import { prayerBackgrounds } from "@/constants/prayers";
+import { useThemeColors } from "@/context/ThemeContext";
 import { useDeviceHeading } from "@/hooks/useDeviceHeading";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
@@ -14,6 +15,7 @@ export default function Qibla() {
   const { qiblaData, loading, error: qiblaError } = useQiblaDirection(location);
   const { nextPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
+  const { colors } = useThemeColors();
 
   const error = locationError || qiblaError;
 
@@ -59,15 +61,50 @@ export default function Qibla() {
           />
         </View>
       )}
-      {/* //TODO Change out helper text*/}
       {qiblaData && (
         <View className="absolute bottom-24 left-0 right-0 px-6">
-          <Text className="text-sm text-gray-600 text-center">
-            The green arrow points to the Qibla direction
-          </Text>
-          <Text className="text-xs text-gray-500 mt-2 text-center">
-            Device heading: {Math.round(deviceHeading + 360) % 360}°
-          </Text>
+          {(() => {
+            // Calculate relative angle from device heading to Kaaba
+            let relativeAngle = qiblaData.direction - deviceHeading;
+            // Normalize to -180 to 180 range
+            relativeAngle = ((relativeAngle + 180) % 360) - 180;
+
+            // Determine direction guidance
+            let guidance = "";
+            let directionWord = "";
+            if (Math.abs(relativeAngle) < 2.5) {
+              guidance = "Facing the ";
+              directionWord = "Kaaba";
+            } else {
+              // Use sine to determine if Kaaba is on left or right
+              // sin > 0 = icon is on the right (0° to 180°), sin < 0 = icon is on the left (180° to 360°)
+              const radians = (relativeAngle * Math.PI) / 180;
+              if (Math.sin(radians) > 0) {
+                guidance = "Turn to your ";
+                directionWord = "right";
+              } else {
+                guidance = "Turn to your ";
+                directionWord = "left";
+              }
+            }
+
+            return (
+              <View className="flex-row justify-center">
+                <Text
+                  className=" font-bold text-center text-[40px]"
+                  style={{ color: colors.inactive }}
+                >
+                  {guidance}
+                </Text>
+                <Text
+                  className=" font-bold text-center text-[40px]"
+                  style={{ color: colors.active }}
+                >
+                  {directionWord}
+                </Text>
+              </View>
+            );
+          })()}
         </View>
       )}
     </View>
