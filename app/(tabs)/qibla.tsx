@@ -45,6 +45,7 @@ export default function Qibla() {
         qiblaDirection={qiblaData?.direction ?? null}
         locationName={locationName}
         backgroundImage={backgroundImage}
+        nextPrayer={nextPrayer}
       />
 
       {qiblaData && (

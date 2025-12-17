@@ -1,7 +1,5 @@
-import { getCardinalDirection } from "@/utils/prayerHelpers";
 import React from "react";
 import { Dimensions, Image, Text, View } from "react-native";
-import { Icon } from "react-native-ui-lib";
 
 const { height } = Dimensions.get("window");
 
@@ -9,12 +7,14 @@ interface QiblaHeaderProps {
   qiblaDirection: number | null;
   locationName: string;
   backgroundImage: any;
+  nextPrayer?: { prayer: string } | null;
 }
 
 export const QiblaHeader = ({
   qiblaDirection,
   locationName,
   backgroundImage,
+  nextPrayer,
 }: QiblaHeaderProps) => {
   return (
     <>
@@ -29,22 +29,28 @@ export const QiblaHeader = ({
         className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
         style={{ height: height * 0.455 }}
       />
-      {/* //TODO: Change style to match prayer screen */}
-      <View className="absolute left-0 right-0 items-center pt-24">
-        <Text className="font-extrabold text-white text-[80px]">
-          {qiblaDirection !== null
-            ? `${getCardinalDirection(qiblaDirection)} ${Math.round(
-                qiblaDirection
-              )}°`
-            : "--"}
-        </Text>
-        <View className="flex-row items-center gap-1">
-          <Text className="text-sm font-bold text-white">{locationName}</Text>
-          <Icon
-            source={require("../assets/images/prayer-pro-icons/home-page/icon-location.png")}
-            size={12}
-            tintColor="white"
-          />
+      {/* Location display */}
+      <View className="absolute left-0 right-0 items-center pt-20">
+        <View className="items-center">
+          {locationName.includes(",") ? (
+            <>
+              <Text className="font-extrabold text-white text-[40px]">
+                {locationName.split(",")[0]},
+              </Text>
+              <Text className="font-extrabold text-white text-[40px]">
+                {locationName.split(",")[1].trim()}
+              </Text>
+            </>
+          ) : (
+            <Text className="font-extrabold text-white text-[40px]">
+              {locationName}
+            </Text>
+          )}
+          <Text className=" font-bold text-sm text-white">
+            {nextPrayer
+              ? `Upcoming Prayer: ${nextPrayer.prayer}`
+              : "Loading upcoming prayer..."}
+          </Text>
         </View>
       </View>
     </>
