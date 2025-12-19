@@ -21,6 +21,12 @@ export default function SettingsStack() {
           headerShown: true,
         }}
       />
+      <Stack.Screen
+        name="(tabs)/settings-calendar"
+        options={{
+          headerShown: true,
+        }}
+      />
     </Stack>
   );
 }

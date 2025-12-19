@@ -53,7 +53,8 @@ export const prayerThemeColors = {
     inactive: "#C39BD3",
   },
   Isha: {
-    active: "#532e70",
-    inactive: "#854ab4",
+    active: "#854ab4",
+    inactive: "#532e70",
+    
   },
 };

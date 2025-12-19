@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import React from "react";
 import { Button, Text, View } from "react-native";
 
 export default function SettingsHome() {
@@ -19,6 +20,10 @@ export default function SettingsHome() {
       <Button
         title="Carousel Settings"
         onPress={() => router.navigate("/settings-tabs/settings-carousel")}
+      />
+      <Button
+        title="Calendar Settings"
+        onPress={() => router.navigate("/settings-tabs/settings-calendar")}
       />
     </View>
   );

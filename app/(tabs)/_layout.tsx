@@ -12,6 +12,14 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarStyle: {
           borderTopWidth: 0,
+          height: 80,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingTop: 6,
+          paddingBottom: 12,
+        },
+        tabBarIconStyle: {
+          marginTop: 0,
         },
         tabBarActiveTintColor: colors.active,
         tabBarInactiveTintColor: colors.inactive,
