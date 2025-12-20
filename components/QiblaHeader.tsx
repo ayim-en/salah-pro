@@ -31,22 +31,15 @@ export const QiblaHeader = ({
       />
       {/* Location display */}
       <View className="absolute left-0 right-0 items-center pt-20">
-        <View className="items-center">
-          {locationName.includes(",") ? (
-            <>
-              <Text className="font-extrabold text-white text-[40px]">
-                {locationName.split(",")[0]},
-              </Text>
-              <Text className="font-extrabold text-white text-[40px]">
-                {locationName.split(",")[1].trim()}
-              </Text>
-            </>
-          ) : (
-            <Text className="font-extrabold text-white text-[40px]">
-              {locationName}
-            </Text>
-          )}
-          <Text className=" font-bold text-sm text-white pt-3">
+        <View className="items-center w-[90%]">
+          <Text
+            className="font-extrabold text-white text-[48px] text-center"
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
+            {locationName}
+          </Text>
+          <Text className=" font-bold text-lg text-white pt-3">
             {nextPrayer
               ? `Upcoming Prayer: ${nextPrayer.prayer}`
               : "Loading upcoming prayer..."}

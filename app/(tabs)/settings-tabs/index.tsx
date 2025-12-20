@@ -25,6 +25,10 @@ export default function SettingsHome() {
         title="Calendar Settings"
         onPress={() => router.navigate("/settings-tabs/settings-calendar")}
       />
+      <View
+        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
+        style={{ height: 10 }}
+      />
     </View>
   );
 }

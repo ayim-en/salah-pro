@@ -1,6 +1,6 @@
 import type { PrayerCarouselRef } from "@/components/PrayerCarousel";
 import { PrayerCarousel } from "@/components/PrayerCarousel";
-import { UpcomingPrayerHeader } from "@/components/UpcomingPrayerHeader";
+import { PrayerHeader } from "@/components/PrayerHeader";
 import { prayerThemeColors } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
@@ -77,7 +77,7 @@ export default function Index() {
   return (
     <View className="flex-1 bg-blue-500">
       <StatusBar style="light" />
-      <UpcomingPrayerHeader
+      <PrayerHeader
         key={nextPrayer?.prayer}
         nextPrayer={nextPrayer}
         locationName={locationName}

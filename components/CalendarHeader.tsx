@@ -21,14 +21,14 @@ export const CalendarHeader = ({
         resizeMode="cover"
       />
 
-      <View className="absolute left-0 right-0 justify-center items-center pt-24 mb-14">
-        <Text className="font-bold text-rg text-white">
-          {nextPrayer
-            ? `Upcoming Prayer: ${nextPrayer.prayer}`
-            : "Loading prayer times..."}
-        </Text>
+      <View className="absolute left-0 right-0 justify-center items-center pt-20 mb-14">
         <Text className="font-extrabold text-white text-[90px]">
           {nextPrayer ? nextPrayer.time : "--:--"}
+        </Text>
+        <Text className="font-bold text-lg text-white">
+          {nextPrayer
+            ? `Upcoming Date: ${nextPrayer.prayer}`
+            : "Loading prayer times..."}
         </Text>
       </View>
     </>
