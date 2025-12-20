@@ -1,6 +1,18 @@
 import { Prayers } from "@/constants/prayers";
 import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 
+// Formats DD-MM-YYYY date string for display
+export const formatHijriDate = (ddmmyyyyDate: string): string => {
+  const [day, month, year] = ddmmyyyyDate.split("-");
+  const date = new Date(`${year}-${month}-${day}`);
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  };
+  return date.toLocaleDateString("en-US", options);
+};
+
 // Formats ISO date string for display
 export const formatDate = (isoDate: string): string => {
   const date = new Date(isoDate);
