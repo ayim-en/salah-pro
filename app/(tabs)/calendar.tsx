@@ -4,13 +4,19 @@ import { prayerBackgrounds } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
-import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import {
+  NextHijriHolidayData,
+  fetchNextHijriHoliday,
+} from "@/prayer-api/islamicCalendarAPI";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 
 export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
+  );
+  const [nextHoliday, setNextHoliday] = useState<NextHijriHolidayData | null>(
+    null
   );
   const { colors } = useThemeColors();
   const { location, locationName } = useLocation();
@@ -20,13 +26,34 @@ export default function CalendarScreen() {
     ? prayerBackgrounds[nextPrayer.prayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
 
+  useEffect(() => {
+    let isActive = true;
+
+    const loadHoliday = async () => {
+      try {
+        const data = await fetchNextHijriHoliday();
+        if (isActive) {
+          setNextHoliday(data);
+        }
+      } catch (error) {
+        console.error("Failed to load next Hijri holiday", error);
+      }
+    };
+
+    loadHoliday();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   return (
     <View className="flex-1">
-      <StatusBar hidden />
       <CalendarHeader
         locationName={locationName}
         backgroundImage={backgroundImage}
         nextPrayer={nextPrayer}
+        nextHoliday={nextHoliday}
       />
       <View className="flex-1 items-center justify-center p-4 pt-28">
         <CalendarCard
