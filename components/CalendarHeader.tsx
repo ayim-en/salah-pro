@@ -29,8 +29,8 @@ export const CalendarHeader = ({
         resizeMode="cover"
       />
 
-      <View className="absolute left-0 right-0 justify-center items-center pt-24">
-        <Text className="font-bold text-2xl text-white text-center">
+      <View className="absolute left-0 right-0 justify-center items-center pt-20 gap-2">
+        <Text className="font-bold text-3xl text-white text-center">
           {nextHoliday
             ? hasHoliday
               ? "Upcoming Holiday:"
@@ -39,10 +39,10 @@ export const CalendarHeader = ({
         </Text>
         {nextHoliday && hasHoliday && (
           <>
-            <Text className="font-bold text-3xl text-white text-center">
+            <Text className="font-bold text-5xl text-white text-center">
               {holidayName}
             </Text>
-            <Text className="font-bold text-2xl text-white text-center">
+            <Text className="font-bold text-3xl text-white text-center">
               {formatHijriDate(nextHoliday.gregorian.date)}
             </Text>
           </>

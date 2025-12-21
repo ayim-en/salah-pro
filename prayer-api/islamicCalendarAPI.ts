@@ -1,9 +1,10 @@
 import { INCLUDED_HOLIDAYS } from "@/constants/holidays";
 import {
-  getMonthsForCurrentYear,
-  findNextUpcomingHoliday,
-  getIncludedHolidaysFromDay,
+    findNextUpcomingHoliday,
+    getIncludedHolidaysFromDay,
+    getMonthsForCurrentYear,
 } from "@/utils/calendarHelpers";
+import { getCachedCalendar, cacheCalendar } from "@/utils/cacheHelpers";
 
 // Hijri Holidays by year
 // get /islamicHolidaysByHijriYear/{year}
@@ -119,16 +120,24 @@ export const fetchNextIncludedHijriHoliday = async (options?: {
     calendarMethod?: "HJCoSA" | "UAQ" | "DIYANET" | "MATHEMATICAL";
 }): Promise<NextHijriHolidayData | null> => {
     try {
-        // Get months to fetch for current calendar year
-        const monthsToFetch = getMonthsForCurrentYear();
+        // Try to get cached calendar data first
+        let allDays = await getCachedCalendar();
 
-        // Fetch each month's calendar
-        const calendars = await Promise.all(
-            monthsToFetch.map(({ month, year }) => 
-                fetchHijriCalendar(month, year, options)
-            )
-        );
-        const allDays = calendars.flat();
+        // If no cached data or cache expired, fetch from API
+        if (!allDays) {
+            const monthsToFetch = getMonthsForCurrentYear();
+
+            // Fetch each month's calendar
+            const calendars = await Promise.all(
+                monthsToFetch.map(({ month, year }) => 
+                    fetchHijriCalendar(month, year, options)
+                )
+            );
+            allDays = calendars.flat();
+
+            // Cache the data for future use
+            await cacheCalendar(allDays);
+        }
 
         // Find the next upcoming holiday
         const nextDay = findNextUpcomingHoliday(allDays);
