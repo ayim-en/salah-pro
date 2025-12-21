@@ -1,10 +1,14 @@
 import { Prayers } from "@/constants/prayers";
 import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
+import { getLocalISODate } from "@/utils/calendarHelpers";
 
-// Formats DD-MM-YYYY date string for display
+// Formats DD-MM-YYYY date string for display (local time)
 export const formatHijriDate = (ddmmyyyyDate: string): string => {
-  const [day, month, year] = ddmmyyyyDate.split("-");
-  const date = new Date(`${year}-${month}-${day}`);
+  const [dayStr, monthStr, yearStr] = ddmmyyyyDate.split("-");
+  const day = Number(dayStr);
+  const month = Number(monthStr);
+  const year = Number(yearStr);
+  const date = new Date(year, month - 1, day);
   const options: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
@@ -13,9 +17,13 @@ export const formatHijriDate = (ddmmyyyyDate: string): string => {
   return date.toLocaleDateString("en-US", options);
 };
 
-// Formats ISO date string for display
+// Formats ISO date string (YYYY-MM-DD) for display (local time)
 export const formatDate = (isoDate: string): string => {
-  const date = new Date(isoDate);
+  const [yearStr, monthStr, dayStr] = isoDate.split("-");
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+  const date = new Date(year, month - 1, day);
   const options: Intl.DateTimeFormatOptions = {
     weekday: "short",
     month: "short",
@@ -41,7 +49,7 @@ export const getNextPrayer = (
   prayerDict: PrayerDict
 ): { prayer: string; time: string } | null => {
   const now = new Date();
-  const todayISO = now.toISOString().slice(0, 10);
+  const todayISO = getLocalISODate(now);
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   const todayPrayers = prayerDict[todayISO];
@@ -63,7 +71,7 @@ export const getNextPrayer = (
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const tomorrowISO = tomorrow.toISOString().slice(0, 10);
+  const tomorrowISO = getLocalISODate(tomorrow);
   const tomorrowPrayers = prayerDict[tomorrowISO];
 
   if (tomorrowPrayers) {

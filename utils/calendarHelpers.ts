@@ -7,10 +7,17 @@ export const convertDDMMYYYYToISO = (ddmmyyyyDate: string): string => {
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 };
 
-// Get the current date as ISO string (YYYY-MM-DD)
+// Get ISO date (YYYY-MM-DD) for a given Date in local time
+export const getLocalISODate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+// Get the current local date as ISO string (YYYY-MM-DD)
 export const getTodayISO = (): string => {
-  const today = new Date();
-  return today.toISOString().split('T')[0];
+  return getLocalISODate(new Date());
 };
 
 // Generate array of months to fetch for the current calendar year and next year

@@ -1,4 +1,5 @@
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
+import { getLocalISODate } from "@/utils/calendarHelpers";
 import { getNextPrayer } from "@/utils/prayerHelpers";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
@@ -45,7 +46,8 @@ export const usePrayerTimes = (location: Location.LocationObject | null) => {
   );
 
   // Finds index of today's date using ISO string
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const todayISO = getLocalISODate(now);
   const todayIndex = useMemo(
     () =>
       Math.max(

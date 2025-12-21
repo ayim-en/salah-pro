@@ -7,10 +7,8 @@ const { width } = Dimensions.get("window");
 interface CalendarCardProps {
   selectedDate: string;
   onDayPress: (day: { dateString: string }) => void;
-  markedDates: Record<
-    string,
-    { selected: boolean; selectedColor: string; selectedTextColor: string }
-  >;
+  // Allow selection and dot markings (react-native-calendars MarkedDates shape)
+  markedDates: Record<string, any>;
   colors: { active: string; inactive: string };
 }
 
