@@ -30,7 +30,7 @@ export const QiblaHeader = ({
         style={{ height: height * 0.455 }}
       />
       {/* Location display */}
-      <View className="absolute left-0 right-0 items-center pt-20">
+      <View className="absolute left-0 right-0 items-center pt-24">
         <View className="items-center w-[90%]">
           <Text
             className="font-extrabold text-white text-[48px] text-center"

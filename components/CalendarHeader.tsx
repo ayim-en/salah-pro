@@ -16,7 +16,9 @@ export const CalendarHeader = ({
   backgroundImage,
   nextHoliday,
 }: CalendarHeaderProps) => {
-  const holidayName = nextHoliday?.hijri?.holidays?.[0];
+  const holidayName =
+    nextHoliday?.hijri?.holidays?.[0] || nextHoliday?.gregorian?.holidays?.[0];
+  const hasHoliday = holidayName !== undefined;
 
   return (
     <>
@@ -29,12 +31,16 @@ export const CalendarHeader = ({
 
       <View className="absolute left-0 right-0 justify-center items-center pt-24">
         <Text className="font-bold text-2xl text-white text-center">
-          {nextHoliday ? "Upcoming Holiday:" : "Loading upcoming holiday..."}
+          {nextHoliday
+            ? hasHoliday
+              ? "Upcoming Holiday:"
+              : "No Upcoming Holiday"
+            : "Loading upcoming holiday..."}
         </Text>
-        {nextHoliday && (
+        {nextHoliday && hasHoliday && (
           <>
             <Text className="font-bold text-3xl text-white text-center">
-              {holidayName ?? "TBD"}
+              {holidayName}
             </Text>
             <Text className="font-bold text-2xl text-white text-center">
               {formatHijriDate(nextHoliday.gregorian.date)}

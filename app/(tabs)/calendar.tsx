@@ -6,7 +6,7 @@ import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import {
   NextHijriHolidayData,
-  fetchNextHijriHoliday,
+  fetchNextIncludedHijriHoliday,
 } from "@/prayer-api/islamicCalendarAPI";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -31,7 +31,7 @@ export default function CalendarScreen() {
 
     const loadHoliday = async () => {
       try {
-        const data = await fetchNextHijriHoliday();
+        const data = await fetchNextIncludedHijriHoliday();
         if (isActive) {
           setNextHoliday(data);
         }

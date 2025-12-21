@@ -1,0 +1,64 @@
+import { INCLUDED_HOLIDAYS } from "@/constants/holidays";
+import { CalendarDay } from "@/prayer-api/islamicCalendarAPI";
+
+// Convert DD-MM-YYYY format to YYYY-MM-DD format
+export const convertDDMMYYYYToISO = (ddmmyyyyDate: string): string => {
+  const [day, month, year] = ddmmyyyyDate.split('-');
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+};
+
+// Get the current date as ISO string (YYYY-MM-DD)
+export const getTodayISO = (): string => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+};
+
+// Generate array of months to fetch for the current calendar year and next year
+export const getMonthsForCurrentYear = (): { month: number; year: number }[] => {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const monthsToFetch = [];
+
+  // Fetch all months for current year
+  for (let month = 1; month <= 12; month++) {
+    monthsToFetch.push({
+      month,
+      year: currentYear
+    });
+  }
+
+  // Also fetch all months for next year so a holiday will be displayed at the end of the year
+  for (let month = 1; month <= 12; month++) {
+    monthsToFetch.push({
+      month,
+      year: currentYear + 1
+    });
+  }
+
+  return monthsToFetch;
+};
+
+// Check if a calendar day has any included holidays
+export const hasIncludedHoliday = (day: CalendarDay): boolean => {
+  const allHolidays = [...day.hijri.holidays, ...day.hijri.adjustedHolidays];
+  return allHolidays.some(holiday => INCLUDED_HOLIDAYS.includes(holiday));
+};
+
+// Filter included holidays from a calendar day
+export const getIncludedHolidaysFromDay = (day: CalendarDay): string[] => {
+  const allHolidays = [...day.hijri.holidays, ...day.hijri.adjustedHolidays];
+  return allHolidays.filter(h => INCLUDED_HOLIDAYS.includes(h));
+};
+
+// Find the next upcoming holiday from a list of calendar days
+export const findNextUpcomingHoliday = (days: CalendarDay[]): CalendarDay | null => {
+  const todayISO = getTodayISO();
+
+  const upcomingHolidays = days.filter(day => {
+    const dayDate = convertDDMMYYYYToISO(day.gregorian.date);
+    if (dayDate < todayISO) return false;
+    return hasIncludedHoliday(day);
+  });
+
+  return upcomingHolidays.length > 0 ? upcomingHolidays[0] : null;
+};
