@@ -11,11 +11,13 @@ import {
 import { getCachedCalendar } from "@/utils/cacheHelpers";
 import {
   convertDDMMYYYYToISO,
+  getIncludedHolidaysFromDay,
   getTodayISO,
   hasIncludedHoliday,
 } from "@/utils/calendarHelpers";
 import React, { useEffect, useMemo, useState } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
+import { Icon } from "react-native-ui-lib";
 
 export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(getTodayISO());
@@ -47,8 +49,9 @@ export default function CalendarScreen() {
           for (const day of allDays) {
             if (hasIncludedHoliday(day)) {
               const iso = convertDDMMYYYYToISO(day.gregorian.date);
-              // A single dot per holiday date
-              marks[iso] = { ...(marks[iso] || {}), marked: true };
+              const holidays = getIncludedHolidaysFromDay(day);
+              // Store both marked status and holiday names
+              marks[iso] = { ...(marks[iso] || {}), marked: true, holidays };
             }
           }
           setHolidayMarks(marks);
@@ -81,6 +84,12 @@ export default function CalendarScreen() {
     };
   }, [holidayMarks, selectedDate, colors.active]);
 
+  // Get holiday names for the selected date (if any)
+  const selectedHolidays = useMemo(() => {
+    const mark = holidayMarks[selectedDate];
+    return mark?.holidays || [];
+  }, [holidayMarks, selectedDate]);
+
   return (
     <View className="flex-1">
       <CalendarHeader
@@ -89,7 +98,7 @@ export default function CalendarScreen() {
         nextPrayer={nextPrayer}
         nextHoliday={nextHoliday}
       />
-      <View className="flex-1 items-center justify-center p-4 pt-28">
+      <View className="flex-1 items-center justify-center p-4 pt-24">
         <CalendarCard
           selectedDate={selectedDate}
           onDayPress={(day) => setSelectedDate(day.dateString)}
@@ -97,6 +106,26 @@ export default function CalendarScreen() {
           colors={colors}
         />
       </View>
+      {selectedHolidays.length > 0 && (
+        <View className="absolute bottom-20 left-4 right-4 items-center">
+          <View className="bg-white rounded-2xl p-4 flex-row gap-2 items-center">
+            {selectedHolidays.map((holiday, index) => (
+              <Text
+                key={index}
+                className="text-center text-base font-semibold"
+                style={{ color: colors.active }}
+              >
+                {holiday}
+              </Text>
+            ))}
+            <Icon
+              source={require("../../assets/images/prayer-pro-icons/calendar-tab/calendar-info.png")}
+              tintColor={colors.active}
+              size={24}
+            />
+          </View>
+        </View>
+      )}
       <View
         className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
         style={{ height: 10 }}
