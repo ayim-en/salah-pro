@@ -6,9 +6,10 @@ import {
     getMonthsForCurrentYear,
 } from "@/utils/calendarHelpers";
 
-// Hijri Holidays by year
-// get /islamicHolidaysByHijriYear/{year}
+const delay = (ms: number): Promise<void> =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 
+// Calendar type definitions
 export interface HolidayData {
     year: number;
     holidays: string[];
@@ -20,7 +21,6 @@ export interface HolidayResponse {
     data: HolidayData;
 }
 
-// Calendar day interface
 export interface CalendarDay {
     hijri: {
         date: string;
@@ -59,17 +59,32 @@ export interface NextHijriHolidayResponse {
         };
     };
 }
+
 export type NextHijriHolidayData = NextHijriHolidayResponse["data"];
 
+export type CalendarMethod = "HJCoSA" | "UAQ" | "DIYANET" | "MATHEMATICAL";
+
+export interface CalendarOptions {
+    calendarMethod?: CalendarMethod;
+}
+
+const API_BASE_URL = "https://api.aladhan.com/v1";
+
+// Fetch Islamic holidays for a specific Hijri year
 export const fetchHijriHolidaysByYear = async (year: number): Promise<HolidayData> => {
     try {
-        const response = await fetch(
-            `https://api.aladhan.com/v1/islamicHolidaysByHijriYear/${year}`);
+        const url = `${API_BASE_URL}/islamicHolidaysByHijriYear/${year}`;
+        const response = await fetch(url);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const json: HolidayResponse = await response.json();
+        
+        if (!json || !json.data) {
+            throw new Error("Invalid API response structure");
+        }
         
         // Filter holidays to only include those in INCLUDED_HOLIDAYS
         const filteredHolidays = json.data.holidays.filter(holiday => 
@@ -86,13 +101,13 @@ export const fetchHijriHolidaysByYear = async (year: number): Promise<HolidayDat
     }
 };
 
-// Fetch Hijri calendar by Gregorian month and year
+
+// Fetch Hijri calendar data for a specific Gregorian month and year
+
 export const fetchHijriCalendar = async (
     month: number,
     year: number,
-    options?: {
-        calendarMethod?: "HJCoSA" | "UAQ" | "DIYANET" | "MATHEMATICAL";
-    }
+    options?: CalendarOptions
 ): Promise<CalendarDay[]> => {
     const params = new URLSearchParams();
     if (options?.calendarMethod) {
@@ -100,25 +115,35 @@ export const fetchHijriCalendar = async (
     }
 
     const queryString = params.toString();
-    const url = `https://api.aladhan.com/v1/gToHCalendar/${month}/${year}${queryString ? `?${queryString}` : ""}`;
+    const url = `${API_BASE_URL}/gToHCalendar/${month}/${year}${queryString ? `?${queryString}` : ""}`;
 
     try {
+        console.log(`[fetchHijriCalendar] Fetching ${month}/${year}...`);
         const response = await fetch(url);
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const json: CalendarResponse = await response.json();
+        
+        if (!json || !json.data) {
+            throw new Error("Invalid API response structure");
+        }
+        
+        console.log(`[fetchHijriCalendar] ${month}/${year} - Got ${json.data.length} days`);
         return json.data;
     } catch (error) {
-        console.error("Error fetching Hijri calendar:", error);
+        console.error(`Error fetching Hijri calendar for ${month}/${year}:`, error);
         throw error;
     }
 };
 
-// Get the next included holiday from the calendar
-export const fetchNextIncludedHijriHoliday = async (options?: {
-    calendarMethod?: "HJCoSA" | "UAQ" | "DIYANET" | "MATHEMATICAL";
-}): Promise<NextHijriHolidayData | null> => {
+// Fetch the next included Islamic holiday from the calendar
+
+export const fetchNextIncludedHijriHoliday = async (
+    options?: CalendarOptions
+): Promise<NextHijriHolidayData | null> => {
     try {
         // Try to get cached calendar data first
         let allDays = await getCachedCalendar();
@@ -127,16 +152,32 @@ export const fetchNextIncludedHijriHoliday = async (options?: {
         if (!allDays) {
             const monthsToFetch = getMonthsForCurrentYear();
 
-            // Fetch each month's calendar
-            const calendars = await Promise.all(
-                monthsToFetch.map(({ month, year }) => 
-                    fetchHijriCalendar(month, year, options)
-                )
-            );
+            // Fetch months sequentially with delay to avoid rate limiting
+            // Skip failed months instead of failing entirely
+            const calendars: CalendarDay[][] = [];
+            for (const { month, year } of monthsToFetch) {
+                try {
+                    const calendar = await fetchHijriCalendar(month, year, options);
+                    calendars.push(calendar);
+                } catch (error) {
+                    console.warn(`[fetchNextIncludedHijriHoliday] Skipping month ${month}/${year} due to error:`, error);
+                    // Continue with other months
+                }
+                // Add small delay between requests to avoid rate limiting
+                await delay(500);
+            }
+            
+            if (calendars.length === 0) {
+                console.error("[fetchNextIncludedHijriHoliday] All months failed to load");
+                return null;
+            }
+            
             allDays = calendars.flat();
 
-            // Cache the data for future use
-            await cacheCalendar(allDays);
+            // Only cache if we got most months (at least 10 of 12)
+            if (calendars.length >= 10) {
+                await cacheCalendar(allDays);
+            }
         }
 
         // Find the next upcoming holiday
@@ -147,7 +188,7 @@ export const fetchNextIncludedHijriHoliday = async (options?: {
 
             return {
                 gregorian: {
-                    date: nextDay.gregorian.date, // Keep DD-MM-YYYY format for formatHijriDate
+                    date: nextDay.gregorian.date,
                     holidays: includedHolidays
                 },
                 hijri: {
@@ -163,10 +204,11 @@ export const fetchNextIncludedHijriHoliday = async (options?: {
     }
 };
 
-// Next upcoming Hijri holiday - GET /nextHijriHoliday
-export const fetchNextHijriHoliday = async (options?: {
-    calendarMethod?: "HJCoSA" | "UAQ" | "DIYANET" | "MATHEMATICAL";
-}): Promise<NextHijriHolidayData> => {
+// Fetch the next upcoming Hijri holiday directly from API
+
+export const fetchNextHijriHoliday = async (
+    options?: CalendarOptions
+): Promise<NextHijriHolidayData> => {
     const params = new URLSearchParams();
 
     if (options?.calendarMethod) {
@@ -174,16 +216,20 @@ export const fetchNextHijriHoliday = async (options?: {
     }
 
     const queryString = params.toString();
-    const url = `https://api.aladhan.com/v1/nextHijriHoliday${queryString ? `?${queryString}` : ""}`;
+    const url = `${API_BASE_URL}/nextHijriHoliday${queryString ? `?${queryString}` : ""}`;
 
     try {
         const response = await fetch(url);
-
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+        
         const json: NextHijriHolidayResponse = await response.json();
+        
+        if (!json || !json.data) {
+            throw new Error("Invalid API response structure");
+        }
         
         // Filter holidays to only include those in INCLUDED_HOLIDAYS
         const filteredData = { ...json.data };
