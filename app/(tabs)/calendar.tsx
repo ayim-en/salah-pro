@@ -1,5 +1,6 @@
 import { CalendarCard } from "@/components/CalendarCard";
 import { CalendarHeader } from "@/components/CalendarHeader";
+import { HolidayBottomSheet } from "@/components/HolidayBottomSheet";
 import {
   darkModeColors,
   lightModeColors,
@@ -20,7 +21,7 @@ import {
   hasIncludedHoliday,
 } from "@/utils/calendarHelpers";
 import React, { useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Icon } from "react-native-ui-lib";
 
 export default function CalendarScreen() {
@@ -28,6 +29,8 @@ export default function CalendarScreen() {
   const [nextHoliday, setNextHoliday] = useState<NextHijriHolidayData | null>(
     null
   );
+  const [isHolidaySheetOpen, setIsHolidaySheetOpen] = useState(false);
+  const [sheetHolidays, setSheetHolidays] = useState<string[]>([]);
   const { colors, debugPrayer, isDarkMode } = useThemeColors();
   const { location, locationName } = useLocation();
   const { nextPrayer } = usePrayerTimes(location);
@@ -115,7 +118,11 @@ export default function CalendarScreen() {
       </View>
       {selectedHolidays.length > 0 && (
         <View className="absolute bottom-20 left-4 right-4 items-center">
-          <View
+          <Pressable
+            onPress={() => {
+              setSheetHolidays(selectedHolidays);
+              setIsHolidaySheetOpen(true);
+            }}
             className="rounded-2xl p-4 flex-row gap-2 items-center"
             style={{
               backgroundColor: isDarkMode
@@ -123,10 +130,10 @@ export default function CalendarScreen() {
                 : lightModeColors.background,
             }}
           >
-            {selectedHolidays.map((holiday, index) => (
+            {selectedHolidays.map((holiday: string, index: number) => (
               <Text
                 key={index}
-                className="text-center text-base font-semibold"
+                className="text-center text-xl font-semibold"
                 style={{ color: colors.active }}
               >
                 {holiday}
@@ -137,9 +144,18 @@ export default function CalendarScreen() {
               tintColor={colors.active}
               size={24}
             />
-          </View>
+          </Pressable>
         </View>
       )}
+
+      {/* Bottom Sheet Modal */}
+      <HolidayBottomSheet
+        visible={isHolidaySheetOpen}
+        holidays={sheetHolidays}
+        isDarkMode={isDarkMode}
+        colors={colors}
+        onClose={() => setIsHolidaySheetOpen(false)}
+      />
       <View
         className="absolute bottom-0 left-0 right-0 rounded-t-3xl"
         style={{

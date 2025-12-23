@@ -22,7 +22,7 @@ export const QiblaCompass = ({
 
   // Colors based on dark mode
   const compassBgColor = isDarkMode
-    ? darkModeColors.backgroundSecondary
+    ? darkModeColors.background
     : lightModeColors.backgroundSecondary;
   const directionTextColor = isDarkMode
     ? darkModeColors.textTertiary
