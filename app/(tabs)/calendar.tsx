@@ -24,13 +24,15 @@ export default function CalendarScreen() {
   const [nextHoliday, setNextHoliday] = useState<NextHijriHolidayData | null>(
     null
   );
-  const { colors } = useThemeColors();
+  const { colors, debugPrayer } = useThemeColors();
   const { location, locationName } = useLocation();
   const { nextPrayer } = usePrayerTimes(location);
   const [holidayMarks, setHolidayMarks] = useState<Record<string, any>>({});
 
-  const backgroundImage = nextPrayer?.prayer
-    ? prayerBackgrounds[nextPrayer.prayer] || prayerBackgrounds.Fajr
+  // Use debug prayer if set, otherwise use actual next prayer
+  const displayPrayer = debugPrayer || nextPrayer?.prayer;
+  const backgroundImage = displayPrayer
+    ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
 
   useEffect(() => {

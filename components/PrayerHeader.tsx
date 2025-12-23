@@ -29,16 +29,39 @@ export const PrayerHeader = ({
       />
 
       <View className="absolute left-0 right-0 justify-center items-center pt-24 mb-14">
-        <Text className=" font-bold text-lg text-white">
+        <Text
+          className=" font-bold text-lg text-white"
+          style={{
+            textShadowColor: "rgba(0,0,0,0.3)",
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 2,
+          }}
+        >
           {nextPrayer
             ? `Upcoming Prayer: ${nextPrayer.prayer}`
             : "Loading prayer times..."}
         </Text>
-        <Text className="font-extrabold text-white text-[90px]">
+        <Text
+          className="font-extrabold text-white text-[90px]"
+          style={{
+            textShadowColor: "rgba(0,0,0,0.4)",
+            textShadowOffset: { width: 0, height: 2 },
+            textShadowRadius: 4,
+          }}
+        >
           {nextPrayer ? nextPrayer.time : "--:--"}
         </Text>
         <View className="flex-row items-center gap-1">
-          <Text className="text-lg font-bold text-white">{locationName}</Text>
+          <Text
+            className="text-lg font-bold text-white"
+            style={{
+              textShadowColor: "rgba(0,0,0,0.3)",
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 2,
+            }}
+          >
+            {locationName}
+          </Text>
           <Icon
             source={require("../assets/images/prayer-pro-icons/home-page/icon-location.png")}
             size={12}

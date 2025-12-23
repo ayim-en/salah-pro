@@ -37,16 +37,16 @@ export const prayerThemeColors = {
     inactive: "#7BA8CC",
   },
   Sunrise: {
-    active: "#ff9a13",
-    inactive: "#fd8211",
+    active: "#ffc77a",
+    inactive: "#ff9a13",
   },
   Dhuhr: {
     active: "#55bddf",
     inactive: "#78d0e8",
   },
   Asr: {
-    active: "#ffc77a",
-    inactive: "#ff9a13",
+    active: "#ff9a13",
+    inactive: "#fd8211",
   },
   Maghrib: {
     active: "#9B59B6",

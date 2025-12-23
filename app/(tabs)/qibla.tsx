@@ -16,11 +16,14 @@ export default function Qibla() {
   const { qiblaData, loading, error: qiblaError } = useQiblaDirection(location);
   const { nextPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
-  const { colors } = useThemeColors();
+  const { colors, debugPrayer } = useThemeColors();
   const isFacingKaabaRef = useRef(false);
   const isFocused = useIsFocused();
 
   const error = locationError || qiblaError;
+
+  // Use debug prayer if set, otherwise use actual next prayer
+  const displayPrayer = debugPrayer || nextPrayer?.prayer;
 
   // Vibration only when on qibla tab
   useEffect(() => {
@@ -49,8 +52,8 @@ export default function Qibla() {
   }, [isFocused, qiblaData, deviceHeading]);
 
   // Get the background image based on the upcoming prayer
-  const backgroundImage = nextPrayer?.prayer
-    ? prayerBackgrounds[nextPrayer.prayer] || prayerBackgrounds.Fajr
+  const backgroundImage = displayPrayer
+    ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
 
   if (loading) {

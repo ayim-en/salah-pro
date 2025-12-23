@@ -36,10 +36,22 @@ export const QiblaHeader = ({
             className="font-extrabold text-white text-[48px] text-center"
             adjustsFontSizeToFit
             numberOfLines={1}
+            style={{
+              textShadowColor: "rgba(0,0,0,0.4)",
+              textShadowOffset: { width: 0, height: 2 },
+              textShadowRadius: 4,
+            }}
           >
             {locationName}
           </Text>
-          <Text className=" font-bold text-lg text-white pt-3">
+          <Text
+            className=" font-bold text-2xl text-white pt-3"
+            style={{
+              textShadowColor: "rgba(0,0,0,0.3)",
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 2,
+            }}
+          >
             {nextPrayer
               ? `Upcoming Prayer: ${nextPrayer.prayer}`
               : "Loading upcoming prayer..."}
