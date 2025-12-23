@@ -1,7 +1,12 @@
+import {
+  darkModeColors,
+  lightModeColors,
+  prayerBackgrounds,
+} from "@/constants/prayers";
+import { useThemeColors } from "@/context/ThemeContext";
 import React from "react";
 import { Dimensions, Image, Text, View } from "react-native";
 import { Icon } from "react-native-ui-lib";
-import { prayerBackgrounds } from "../constants/prayers";
 
 const { height } = Dimensions.get("window");
 
@@ -14,6 +19,7 @@ export const PrayerHeader = ({
   nextPrayer,
   locationName,
 }: UpcomingPrayerHeaderProps) => {
+  const { isDarkMode } = useThemeColors();
   // Get the background image based on the upcoming prayer
   const backgroundImage = nextPrayer?.prayer
     ? prayerBackgrounds[nextPrayer.prayer] || prayerBackgrounds.Fajr
@@ -70,8 +76,13 @@ export const PrayerHeader = ({
         </View>
       </View>
       <View
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
-        style={{ height: height * 0.5 }}
+        className="absolute bottom-0 left-0 right-0 rounded-t-3xl"
+        style={{
+          height: height * 0.5,
+          backgroundColor: isDarkMode
+            ? darkModeColors.background
+            : lightModeColors.background,
+        }}
       ></View>
     </>
   );

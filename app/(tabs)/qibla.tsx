@@ -1,6 +1,10 @@
 import { QiblaCompass } from "@/components/QiblaCompass";
 import { QiblaHeader } from "@/components/QiblaHeader";
-import { prayerBackgrounds } from "@/constants/prayers";
+import {
+  darkModeColors,
+  lightModeColors,
+  prayerBackgrounds,
+} from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
 import { useDeviceHeading } from "@/hooks/useDeviceHeading";
 import { useLocation } from "@/hooks/useLocation";
@@ -16,7 +20,7 @@ export default function Qibla() {
   const { qiblaData, loading, error: qiblaError } = useQiblaDirection(location);
   const { nextPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
-  const { colors, debugPrayer } = useThemeColors();
+  const { colors, debugPrayer, isDarkMode } = useThemeColors();
   const isFacingKaabaRef = useRef(false);
   const isFocused = useIsFocused();
 
@@ -58,7 +62,14 @@ export default function Qibla() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View
+        className="flex-1 items-center justify-center"
+        style={{
+          backgroundColor: isDarkMode
+            ? darkModeColors.background
+            : lightModeColors.background,
+        }}
+      >
         <ActivityIndicator size="large" />
       </View>
     );
@@ -66,7 +77,14 @@ export default function Qibla() {
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center p-6 bg-white">
+      <View
+        className="flex-1 items-center justify-center p-6"
+        style={{
+          backgroundColor: isDarkMode
+            ? darkModeColors.background
+            : lightModeColors.background,
+        }}
+      >
         <Text className="text-red-600 text-center">{error}</Text>
       </View>
     );

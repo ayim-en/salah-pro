@@ -1,3 +1,5 @@
+import { darkModeColors, lightModeColors } from "@/constants/prayers";
+import { useThemeColors } from "@/context/ThemeContext";
 import React from "react";
 import { Dimensions, Image, Text, View } from "react-native";
 
@@ -16,6 +18,7 @@ export const QiblaHeader = ({
   backgroundImage,
   nextPrayer,
 }: QiblaHeaderProps) => {
+  const { isDarkMode } = useThemeColors();
   return (
     <>
       <Image
@@ -24,10 +27,15 @@ export const QiblaHeader = ({
         resizeMode="cover"
       />
 
-      {/* White rounded section */}
+      {/* White/Dark rounded section */}
       <View
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
-        style={{ height: height * 0.455 }}
+        className="absolute bottom-0 left-0 right-0 rounded-t-3xl"
+        style={{
+          height: height * 0.455,
+          backgroundColor: isDarkMode
+            ? darkModeColors.background
+            : lightModeColors.background,
+        }}
       />
       {/* Location display */}
       <View className="absolute left-0 right-0 items-center pt-24">

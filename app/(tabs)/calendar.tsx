@@ -1,6 +1,10 @@
 import { CalendarCard } from "@/components/CalendarCard";
 import { CalendarHeader } from "@/components/CalendarHeader";
-import { prayerBackgrounds } from "@/constants/prayers";
+import {
+  darkModeColors,
+  lightModeColors,
+  prayerBackgrounds,
+} from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
@@ -24,7 +28,7 @@ export default function CalendarScreen() {
   const [nextHoliday, setNextHoliday] = useState<NextHijriHolidayData | null>(
     null
   );
-  const { colors, debugPrayer } = useThemeColors();
+  const { colors, debugPrayer, isDarkMode } = useThemeColors();
   const { location, locationName } = useLocation();
   const { nextPrayer } = usePrayerTimes(location);
   const [holidayMarks, setHolidayMarks] = useState<Record<string, any>>({});
@@ -106,11 +110,19 @@ export default function CalendarScreen() {
           onDayPress={(day) => setSelectedDate(day.dateString)}
           markedDates={mergedMarkedDates}
           colors={colors}
+          isDarkMode={isDarkMode}
         />
       </View>
       {selectedHolidays.length > 0 && (
         <View className="absolute bottom-20 left-4 right-4 items-center">
-          <View className="bg-white rounded-2xl p-4 flex-row gap-2 items-center">
+          <View
+            className="rounded-2xl p-4 flex-row gap-2 items-center"
+            style={{
+              backgroundColor: isDarkMode
+                ? darkModeColors.background
+                : lightModeColors.background,
+            }}
+          >
             {selectedHolidays.map((holiday, index) => (
               <Text
                 key={index}
@@ -129,8 +141,13 @@ export default function CalendarScreen() {
         </View>
       )}
       <View
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
-        style={{ height: 10 }}
+        className="absolute bottom-0 left-0 right-0 rounded-t-3xl"
+        style={{
+          height: 10,
+          backgroundColor: isDarkMode
+            ? darkModeColors.background
+            : lightModeColors.background,
+        }}
       />
     </View>
   );

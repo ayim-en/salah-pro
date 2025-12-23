@@ -12,9 +12,16 @@ interface ThemeContextType {
   // Debug mode
   debugPrayer: Prayer | null;
   setDebugPrayer: (prayer: Prayer | null) => void;
+  // Dark mode for Maghrib and Isha
+  isDarkMode: boolean;
+  currentPrayer: Prayer | null;
+  setCurrentPrayer: (prayer: Prayer | null) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+// Prayers that trigger dark mode
+const DARK_MODE_PRAYERS: Prayer[] = ["Maghrib", "Isha"];
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -26,6 +33,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Debug: allow manual prayer override for testing themes
   const [debugPrayer, setDebugPrayer] = useState<Prayer | null>(null);
+
+  // Track the current prayer for dark mode calculation
+  const [currentPrayer, setCurrentPrayer] = useState<Prayer | null>(null);
+
+  // Calculate dark mode based on debug prayer or current prayer
+  const activePrayer = debugPrayer || currentPrayer;
+  const isDarkMode = activePrayer
+    ? DARK_MODE_PRAYERS.includes(activePrayer)
+    : false;
 
   // Override colors when debugPrayer is set
   const effectiveSetColors = (newColors: ThemeColors) => {
@@ -51,6 +67,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         setColors: effectiveSetColors,
         debugPrayer,
         setDebugPrayer,
+        isDarkMode,
+        currentPrayer,
+        setCurrentPrayer,
       }}
     >
       {children}

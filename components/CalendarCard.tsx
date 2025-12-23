@@ -1,3 +1,4 @@
+import { darkModeColors, lightModeColors } from "@/constants/prayers";
 import React from "react";
 import { Dimensions, View } from "react-native";
 import { Calendar } from "react-native-calendars";
@@ -10,6 +11,7 @@ interface CalendarCardProps {
   // Allow selection and dot markings (react-native-calendars MarkedDates shape)
   markedDates: Record<string, any>;
   colors: { active: string; inactive: string };
+  isDarkMode?: boolean;
 }
 
 export const CalendarCard = ({
@@ -17,14 +19,26 @@ export const CalendarCard = ({
   onDayPress,
   markedDates,
   colors,
+  isDarkMode = false,
 }: CalendarCardProps) => {
+  const bgColor = isDarkMode
+    ? darkModeColors.background
+    : lightModeColors.background;
+  const dayTextColor = isDarkMode ? darkModeColors.text : colors.active;
+  const disabledTextColor = isDarkMode
+    ? darkModeColors.disabledText
+    : lightModeColors.disabledText;
+  const sectionTitleColor = isDarkMode
+    ? darkModeColors.sectionTitle
+    : lightModeColors.sectionTitle;
+
   return (
     <View
-      className="bg-white rounded-3xl p-6"
-      style={{ width: width, height: width }}
+      className="rounded-3xl p-6"
+      style={{ width: width, height: width, backgroundColor: bgColor }}
     >
       <Calendar
-        key={`${colors.active}-${colors.inactive}`}
+        key={`${colors.active}-${colors.inactive}-${isDarkMode}`}
         current={selectedDate}
         onDayPress={onDayPress}
         markedDates={markedDates}
@@ -32,12 +46,12 @@ export const CalendarCard = ({
         theme={{
           backgroundColor: "transparent",
           calendarBackground: "transparent",
-          textSectionTitleColor: "#b6c1cd",
+          textSectionTitleColor: sectionTitleColor,
           selectedDayBackgroundColor: colors.active,
           selectedDayTextColor: "#ffffff",
           todayTextColor: colors.active,
-          dayTextColor: colors.active,
-          textDisabledColor: "#d9e1e8",
+          dayTextColor: dayTextColor,
+          textDisabledColor: disabledTextColor,
           dotColor: colors.active,
           selectedDotColor: "#ffffff",
           arrowColor: colors.inactive,

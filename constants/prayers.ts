@@ -49,8 +49,8 @@ export const prayerThemeColors = {
     inactive: "#fd8211",
   },
   Maghrib: {
-    active: "#9B59B6",
-    inactive: "#C39BD3",
+    active: "#C39BD3",
+    inactive: "#9B59B6",
   },
   Isha: {
     active: "#854ab4",
@@ -58,3 +58,27 @@ export const prayerThemeColors = {
     
   },
 };
+
+// Light mode colors (default)
+export const lightModeColors = {
+  background: "#ffffff",
+  backgroundSecondary: "#f9fafb",
+  text: "#000000",
+  textSecondary: "#374151",
+  textTertiary: "#4b5563",
+  disabledText: "#d9e1e8",
+  sectionTitle: "#b6c1cd",
+};
+
+// Dark mode colors (for Maghrib and Isha prayers)
+export const darkModeColors = {
+  background: "#1a1a2e",
+  backgroundSecondary: "#2a2a3e",
+  text: "#ffffff",
+  textSecondary: "#e0e0e0",
+  textTertiary: "#d0d0d0",
+  disabledText: "#4a4a5a",
+  sectionTitle: "#8898a8",
+};
+
+

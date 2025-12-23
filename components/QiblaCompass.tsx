@@ -1,3 +1,4 @@
+import { darkModeColors, lightModeColors } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
 import React from "react";
 import { Image, Text, View } from "react-native";
@@ -11,7 +12,7 @@ export const QiblaCompass = ({
   magnetometer,
   qiblaDirection,
 }: QiblaCompassProps) => {
-  const { colors } = useThemeColors();
+  const { colors, isDarkMode } = useThemeColors();
 
   // Calculate Kaaba icon position based on qiblaDirection
   const radius = 140;
@@ -19,13 +20,22 @@ export const QiblaCompass = ({
   const translateX = Math.sin(radians) * radius;
   const translateY = -Math.cos(radians) * radius; // negative because Y increases downward
 
+  // Colors based on dark mode
+  const compassBgColor = isDarkMode
+    ? darkModeColors.backgroundSecondary
+    : lightModeColors.backgroundSecondary;
+  const directionTextColor = isDarkMode
+    ? darkModeColors.textTertiary
+    : lightModeColors.textSecondary;
+
   return (
     <View className="w-96 h-96 items-center justify-center">
       <View
-        className="w-full h-full rounded-full border-8 items-center justify-center bg-gray-50"
+        className="w-full h-full rounded-full border-8 items-center justify-center"
         style={{
           transform: [{ rotate: `${-magnetometer}deg` }],
           borderColor: colors.inactive,
+          backgroundColor: compassBgColor,
         }}
       >
         <View className="absolute top-2">
@@ -35,13 +45,28 @@ export const QiblaCompass = ({
         </View>
 
         <View className="absolute right-2">
-          <Text className="text-3xl font-bold text-gray-700">E</Text>
+          <Text
+            className="text-3xl font-bold"
+            style={{ color: directionTextColor }}
+          >
+            E
+          </Text>
         </View>
         <View className="absolute bottom-2">
-          <Text className="text-3xl font-bold text-gray-700">S</Text>
+          <Text
+            className="text-3xl font-bold"
+            style={{ color: directionTextColor }}
+          >
+            S
+          </Text>
         </View>
         <View className="absolute left-2">
-          <Text className="text-3xl font-bold text-gray-700">W</Text>
+          <Text
+            className="text-3xl font-bold"
+            style={{ color: directionTextColor }}
+          >
+            W
+          </Text>
         </View>
 
         <View

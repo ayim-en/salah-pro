@@ -1,4 +1,9 @@
-import { Prayers, prayerIcons } from "@/constants/prayers";
+import {
+  Prayers,
+  darkModeColors,
+  lightModeColors,
+  prayerIcons,
+} from "@/constants/prayers";
 import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { cleanTimeString, formatDate } from "@/utils/prayerHelpers";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
@@ -20,6 +25,7 @@ interface PrayerCarouselProps {
   notificationsEnabled: Record<string, boolean>;
   onToggleNotification: (prayer: string) => void;
   activeColor: string;
+  isDarkMode?: boolean;
 }
 
 export type PrayerCarouselRef = {
@@ -41,6 +47,7 @@ export const PrayerCarousel = forwardRef<
       notificationsEnabled,
       onToggleNotification,
       activeColor,
+      isDarkMode = false,
     },
     ref
   ) => {
@@ -51,6 +58,18 @@ export const PrayerCarousel = forwardRef<
       goToPage: (page, animated = true) =>
         carouselRef.current?.goToPage?.(page, animated),
     }));
+
+    // Colors based on dark mode
+    const bgColor = isDarkMode
+      ? darkModeColors.background
+      : lightModeColors.background;
+    const textColor = isDarkMode ? darkModeColors.text : lightModeColors.text;
+    const secondaryTextColor = isDarkMode
+      ? darkModeColors.textSecondary
+      : lightModeColors.textSecondary;
+    const tertiaryTextColor = isDarkMode
+      ? darkModeColors.textTertiary
+      : lightModeColors.textTertiary;
 
     return (
       <View className="pt-64 items-center mt-40 mb-12">
@@ -79,7 +98,13 @@ export const PrayerCarousel = forwardRef<
                   className="w-full h-full rounded-xl justify-start"
                 >
                   <View className="mb-4">
-                    <Text className="text-xl font-bold text-black">
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        fontWeight: "bold",
+                        color: textColor,
+                      }}
+                    >
                       {formatDate(isoDate)}
                     </Text>
                     {isToday && (
@@ -104,12 +129,20 @@ export const PrayerCarousel = forwardRef<
                             size={24}
                             tintColor={activeColor}
                           />
-                          <Text className="text-base font-semibold text-gray-800">
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              fontWeight: "600",
+                              color: secondaryTextColor,
+                            }}
+                          >
                             {prayer}
                           </Text>
                         </View>
                         <View className="flex-row items-center gap-4">
-                          <Text className="text-base text-gray-700">
+                          <Text
+                            style={{ fontSize: 16, color: tertiaryTextColor }}
+                          >
                             {cleanTimeString(dayPrayers.timings[prayer])}
                           </Text>
                           <Pressable

@@ -1,10 +1,11 @@
+import { darkModeColors, lightModeColors } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Icon } from "react-native-ui-lib";
 
 export default function TabLayout() {
-  const { colors } = useThemeColors();
+  const { colors, isDarkMode } = useThemeColors();
   return (
     <Tabs
       screenOptions={{
@@ -17,6 +18,9 @@ export default function TabLayout() {
           alignItems: "center",
           paddingTop: 6,
           paddingBottom: 12,
+          backgroundColor: isDarkMode
+            ? darkModeColors.background
+            : lightModeColors.background,
         },
         tabBarIconStyle: {
           marginTop: 0,

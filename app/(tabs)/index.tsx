@@ -17,7 +17,13 @@ export default function Index() {
   const [showDebugPicker, setShowDebugPicker] = useState(false);
   const carouselRef = useRef<PrayerCarouselRef>(null);
   const navigation = useNavigation<any>();
-  const { setColors, debugPrayer, setDebugPrayer } = useThemeColors();
+  const {
+    setColors,
+    debugPrayer,
+    setDebugPrayer,
+    isDarkMode,
+    setCurrentPrayer,
+  } = useThemeColors();
 
   // Custom hooks to get states
   const { location, locationName, error: locationError } = useLocation();
@@ -69,8 +75,10 @@ export default function Index() {
           inactive: colors.inactive,
         });
       }
+      // Update current prayer for dark mode calculation
+      setCurrentPrayer(nextPrayer.prayer as any);
     }
-  }, [nextPrayer, setColors, debugPrayer]);
+  }, [nextPrayer, setColors, debugPrayer, setCurrentPrayer]);
 
   // Determine which prayer to display (debug override or actual next prayer)
   const displayPrayer = debugPrayer || nextPrayer?.prayer;
@@ -194,6 +202,7 @@ export default function Index() {
                 ?.active || "#568FAF"
             : "#568FAF"
         }
+        isDarkMode={isDarkMode}
       />
     </View>
   );
