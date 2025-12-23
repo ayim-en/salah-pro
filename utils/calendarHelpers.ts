@@ -1,6 +1,9 @@
 import { INCLUDED_HOLIDAYS } from "@/constants/holidays";
 import { CalendarDay } from "@/prayer-api/islamicCalendarAPI";
 
+// Label used for the voluntary first six days of Shawwal
+const SHAWWAL_SIX_DAYS = "Six Days of Shawwal";
+
 // Convert DD-MM-YYYY format to YYYY-MM-DD format
 export const convertDDMMYYYYToISO = (ddmmyyyyDate: string): string => {
   const [day, month, year] = ddmmyyyyDate.split('-');
@@ -48,13 +51,29 @@ export const getMonthsForCurrentYear = (): { month: number; year: number }[] => 
 // Check if a calendar day has any included holidays
 export const hasIncludedHoliday = (day: CalendarDay): boolean => {
   const allHolidays = [...day.hijri.holidays, ...day.hijri.adjustedHolidays];
-  return allHolidays.some(holiday => INCLUDED_HOLIDAYS.includes(holiday));
+  if (allHolidays.some((holiday) => INCLUDED_HOLIDAYS.includes(holiday))) {
+    return true;
+  }
+
+  // Manually mark the first six days of Shawwal as holidays (not provided by API)
+  const [dayNumStr, monthStr] = day.hijri.date.split("-");
+  const dayNum = parseInt(dayNumStr, 10);
+  return monthStr === "10" && dayNum >= 1 && dayNum <= 6;
 };
 
 // Filter included holidays from a calendar day
 export const getIncludedHolidaysFromDay = (day: CalendarDay): string[] => {
   const allHolidays = [...day.hijri.holidays, ...day.hijri.adjustedHolidays];
-  return allHolidays.filter(h => INCLUDED_HOLIDAYS.includes(h));
+  const included = allHolidays.filter((h) => INCLUDED_HOLIDAYS.includes(h));
+
+  // Add manual Shawwal entries when applicable
+  const [dayNumStr, monthStr] = day.hijri.date.split("-");
+  const dayNum = parseInt(dayNumStr, 10);
+  if (monthStr === "10" && dayNum >= 2 && dayNum <= 6) {
+    included.push(SHAWWAL_SIX_DAYS);
+  }
+
+  return included;
 };
 
 // Find the next upcoming holiday from a list of calendar days
