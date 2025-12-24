@@ -1,10 +1,20 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
+import {
+  requestNotificationPermissions,
+  scheduleAllPrayerNotifications,
+  cancelPrayerNotifications,
+  schedulePrayerNotification,
+} from "@/utils/notificationService";
+import { getLocalISODate } from "@/utils/calendarHelpers";
+import { parsePrayerTime } from "@/utils/prayerHelpers";
 
-export const useNotifications = () => {
+export const useNotifications = (prayerDict: PrayerDict = {}) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState<
     Record<string, boolean>
   >({});
+  const [permissionGranted, setPermissionGranted] = useState(false);
 
   // Load notification states from AsyncStorage on mount
   useEffect(() => {
@@ -25,25 +35,72 @@ export const useNotifications = () => {
     })();
   }, []);
 
+  // Request permissions on first interaction
+  const ensurePermissions = useCallback(async (): Promise<boolean> => {
+    if (permissionGranted) return true;
+
+    const granted = await requestNotificationPermissions();
+    setPermissionGranted(granted);
+    return granted;
+  }, [permissionGranted]);
+
+  // Schedule notifications when prayer times or enabled prayers change
+  useEffect(() => {
+    if (
+      Object.keys(prayerDict).length > 0 &&
+      Object.values(notificationsEnabled).some((enabled) => enabled)
+    ) {
+      scheduleAllPrayerNotifications(prayerDict, notificationsEnabled);
+    }
+  }, [prayerDict, notificationsEnabled]);
+
   // Toggles notification states for each prayer
   const toggleNotification = async (prayer: string) => {
-    setNotificationsEnabled((prev) => {
-      const updated = { ...prev };
-      updated[prayer] = !updated[prayer];
+    // Request permission if enabling a notification
+    const willBeEnabled = !notificationsEnabled[prayer];
 
-      // Store notification states in AsyncStorage
-      AsyncStorage.setItem(
-        "prayerNotifications",
-        JSON.stringify(updated)
-      ).catch((err: any) => {
-        const errorMessage =
-          err?.message ?? "Failed to save notification settings";
-        console.error("AsyncStorage save error:", errorMessage);
-      });
+    if (willBeEnabled) {
+      const hasPermission = await ensurePermissions();
+      if (!hasPermission) {
+        console.log("Notification permission denied");
+        return;
+      }
+    }
 
-      return updated;
-    });
+    // Update state
+    const updated = { ...notificationsEnabled, [prayer]: willBeEnabled };
+    setNotificationsEnabled(updated);
+
+    // Store notification states in AsyncStorage
+    try {
+      await AsyncStorage.setItem("prayerNotifications", JSON.stringify(updated));
+    } catch (err: any) {
+      console.error("AsyncStorage save error:", err?.message ?? err);
+    }
+
+    // Schedule or cancel notifications for this specific prayer
+    if (willBeEnabled && Object.keys(prayerDict).length > 0) {
+      // Schedule notifications for this prayer
+      const now = new Date();
+      const todayISO = getLocalISODate(now);
+      const sortedDates = Object.keys(prayerDict)
+        .filter((date) => date >= todayISO)
+        .sort()
+        .slice(0, 7);
+
+      for (const isoDate of sortedDates) {
+        const dayPrayers = prayerDict[isoDate];
+        const timings = dayPrayers?.timings as Record<string, string> | undefined;
+        if (timings?.[prayer]) {
+          const prayerTime = parsePrayerTime(isoDate, timings[prayer]);
+          await schedulePrayerNotification(prayer, prayerTime, isoDate);
+        }
+      }
+    } else {
+      // Cancel notifications for this prayer
+      await cancelPrayerNotifications(prayer);
+    }
   };
 
-  return { notificationsEnabled, toggleNotification };
+  return { notificationsEnabled, toggleNotification, permissionGranted };
 };

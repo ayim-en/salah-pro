@@ -27,7 +27,6 @@ export default function Index() {
 
   // Custom hooks to get states
   const { location, locationName, error: locationError } = useLocation();
-  const { notificationsEnabled, toggleNotification } = useNotifications();
   const {
     prayerDict,
     loading,
@@ -37,6 +36,7 @@ export default function Index() {
     todayIndex,
     nextPrayer,
   } = usePrayerTimes(location);
+  const { notificationsEnabled, toggleNotification } = useNotifications(prayerDict);
 
   const error = locationError || prayerError;
 

@@ -37,6 +37,14 @@ export const cleanTimeString = (timeString: string): string => {
   return timeString.split(" ")[0]; // e.g., "05:30 (GMT)" -> "05:30"
 };
 
+// Parses prayer time string to Date object for a given ISO date
+export const parsePrayerTime = (isoDate: string, timeString: string): Date => {
+  const cleanTime = cleanTimeString(timeString);
+  const [hours, minutes] = cleanTime.split(":").map(Number);
+  const [year, month, day] = isoDate.split("-").map(Number);
+  return new Date(year, month - 1, day, hours, minutes, 0);
+};
+
 // Converts prayer time to minutes for comparison
 export const prayerTimeToMinutes = (prayerTime: string): number => {
   const cleanedPrayerTime = prayerTime.split(" ")[0];
