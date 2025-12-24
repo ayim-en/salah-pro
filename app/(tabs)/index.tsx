@@ -6,6 +6,7 @@ import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
 import { useNotifications } from "@/hooks/useNotifications";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
+import { sendTestNotification } from "@/utils/notificationService";
 import { useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -178,6 +179,23 @@ export default function Index() {
               </Text>
             </TouchableOpacity>
           ))}
+          <TouchableOpacity
+            onPress={() => {
+              sendTestNotification();
+              setShowDebugPicker(false);
+            }}
+            style={{
+              paddingVertical: 8,
+              paddingHorizontal: 16,
+              backgroundColor: "#4CAF50",
+              borderRadius: 8,
+              marginTop: 8,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              🔔 Test Notification
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
 

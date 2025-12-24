@@ -1,14 +1,13 @@
-import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
-import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { Prayers } from "@/constants/prayers";
+import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { getLocalISODate } from "@/utils/calendarHelpers";
 import { parsePrayerTime } from "@/utils/prayerHelpers";
+import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 
 // Configure how notifications are handled when the app is in the foreground
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
     shouldShowBanner: true,
@@ -57,10 +56,17 @@ export const schedulePrayerNotification = async (
       return null;
     }
 
+    // Sunrise is not a prayer, so use different wording
+    const isSunrise = prayer === "Sunrise";
+    const title = isSunrise ? "Sunrise" : `${prayer} Prayer Time`;
+    const body = isSunrise
+      ? "The sun is rising — Fajr prayer time has ended"
+      : `It's time for ${prayer} prayer`;
+
     const identifier = await Notifications.scheduleNotificationAsync({
       content: {
-        title: `${prayer} Prayer Time`,
-        body: `It's time for ${prayer} prayer`,
+        title,
+        body,
         sound: "default",
         data: { prayer, date: isoDate },
       },
@@ -112,8 +118,8 @@ export const scheduleAllPrayerNotifications = async (
     .filter((date) => date >= todayISO)
     .sort();
 
-  // Schedule for today and the next few days (limit to avoid too many notifications)
-  const datesToSchedule = sortedDates.slice(0, 7);
+  // Schedule for 10 days (6 prayers × 10 days = 60 notifications, under iOS 64 limit)
+  const datesToSchedule = sortedDates.slice(0, 10);
 
   for (const isoDate of datesToSchedule) {
     const dayPrayers = prayerDict[isoDate];
@@ -130,6 +136,38 @@ export const scheduleAllPrayerNotifications = async (
       await schedulePrayerNotification(prayer, prayerTime, isoDate);
     }
   }
+
+  // Schedule a reminder notification on day 9 to prompt user to open the app
+  await scheduleReminderNotification(sortedDates[8]);
+};
+
+// Schedule a reminder notification to open the app
+const scheduleReminderNotification = async (isoDate: string): Promise<void> => {
+  if (!isoDate) return;
+
+  try {
+    // Schedule for 12:00 PM on the reminder day
+    const reminderTime = new Date(`${isoDate}T12:00:00`);
+
+    // Don't schedule if the time has already passed
+    if (reminderTime <= new Date()) return;
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Open Fardh: Islamic Prayer App",
+        body: "Open the app to continue receiving prayer notifications",
+        sound: "default",
+        data: { type: "reminder" },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: reminderTime,
+        channelId: Platform.OS === "android" ? "prayer-notifications" : undefined,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to schedule reminder notification:", error);
+  }
 };
 
 // Cancel all prayer notifications
@@ -144,4 +182,20 @@ export const cancelAllPrayerNotifications = async (): Promise<void> => {
 // Get all currently scheduled notifications (useful for debugging)
 export const getScheduledNotifications = async () => {
   return await Notifications.getAllScheduledNotificationsAsync();
+};
+
+// Send a test notification in 5 seconds
+export const sendTestNotification = async () => {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Test Prayer Time",
+      body: "It's time for test prayer",
+      sound: "default",
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 5,
+    },
+  });
+  console.log("Test notification scheduled for 5 seconds from now");
 };
