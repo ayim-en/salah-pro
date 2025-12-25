@@ -8,7 +8,8 @@ import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { cleanTimeString, formatDate } from "@/utils/prayerHelpers";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
-import { Carousel, Icon } from "react-native-ui-lib";
+import { Carousel } from "react-native-ui-lib";
+import { AnimatedTintIcon } from "./AnimatedTintIcon";
 
 const { width, height } = Dimensions.get("window");
 const pageHeight = height * 0.45;
@@ -124,7 +125,7 @@ export const PrayerCarousel = forwardRef<
                         className="flex-row justify-between items-center py-2"
                       >
                         <View className="flex-row items-center gap-4">
-                          <Icon
+                          <AnimatedTintIcon
                             source={prayerIcons[prayer]}
                             size={24}
                             tintColor={activeColor}
@@ -148,7 +149,7 @@ export const PrayerCarousel = forwardRef<
                           <Pressable
                             onPress={() => onToggleNotification(prayer)}
                           >
-                            <Icon
+                            <AnimatedTintIcon
                               source={
                                 notificationsEnabled[prayer]
                                   ? require("../assets/images/prayer-pro-icons/home-page/icon-notify-on.png")

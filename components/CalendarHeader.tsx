@@ -1,7 +1,8 @@
 import { NextHijriHolidayData } from "@/prayer-api/islamicCalendarAPI";
 import { formatHijriDate } from "@/utils/prayerHelpers";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { AnimatedCrossfadeImage } from "./AnimatedCrossfadeImage";
 
 interface CalendarHeaderProps {
   nextPrayer: { prayer: string; time: string } | null;
@@ -22,12 +23,7 @@ export const CalendarHeader = ({
 
   return (
     <>
-      <Image
-        key={nextPrayer?.prayer}
-        source={backgroundImage}
-        className="absolute top-0 left-0 w-full h-full"
-        resizeMode="cover"
-      />
+      <AnimatedCrossfadeImage source={backgroundImage} resizeMode="cover" />
 
       <View className="absolute left-0 right-0 justify-center items-center pt-20 gap-2">
         <Text

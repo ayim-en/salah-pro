@@ -1,22 +1,23 @@
+import { DebugPrayerPicker } from "@/components/DebugPrayerPicker";
 import { darkModeColors, lightModeColors } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
+import { useAnimatedBackgroundColor } from "@/hooks/useAnimatedColor";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Button, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 export default function SettingsHome() {
   const router = useRouter();
   const { isDarkMode } = useThemeColors();
+  const bgColor = isDarkMode
+    ? darkModeColors.background
+    : lightModeColors.background;
+  const animatedBgStyle = useAnimatedBackgroundColor(bgColor);
 
   return (
-    <View
-      className="flex-1 items-center p-6"
-      style={{
-        backgroundColor: isDarkMode
-          ? darkModeColors.background
-          : lightModeColors.background,
-      }}
-    >
+    <Animated.View className="flex-1 items-center p-6" style={animatedBgStyle}>
+      <DebugPrayerPicker />
       <View className="flex-1 justify-center max-w-[960px] mx-auto">
         <Text
           className="text-6xl font-bold"
@@ -43,15 +44,10 @@ export default function SettingsHome() {
         title="Calendar Settings"
         onPress={() => router.navigate("/settings-tabs/settings-calendar")}
       />
-      <View
+      <Animated.View
         className="absolute bottom-0 left-0 right-0 rounded-t-3xl"
-        style={{
-          height: 10,
-          backgroundColor: isDarkMode
-            ? darkModeColors.background
-            : lightModeColors.background,
-        }}
+        style={[{ height: 10 }, animatedBgStyle]}
       />
-    </View>
+    </Animated.View>
   );
 }

@@ -63,11 +63,49 @@ export const usePrayerTimes = (location: Location.LocationObject | null) => {
     time: string;
   } | null>(null);
 
-  // Updates nextPrayer when prayerDict changes
+  // Updates nextPrayer when prayerDict changes and schedules update for next prayer time
   useEffect(() => {
-    if (Object.keys(prayerDict).length > 0) {
+    if (Object.keys(prayerDict).length === 0) return;
+
+    const updateNextPrayer = () => {
       setNextPrayer(getNextPrayer(prayerDict));
-    }
+    };
+
+    // Initial update
+    updateNextPrayer();
+
+    // Schedule timeout for when the current next prayer time arrives
+    const scheduleNextUpdate = () => {
+      const current = getNextPrayer(prayerDict);
+      if (!current?.time) return null;
+
+      // Parse the prayer time (HH:MM format)
+      const [hours, minutes] = current.time.split(":").map(Number);
+      const now = new Date();
+      const prayerTime = new Date();
+      prayerTime.setHours(hours, minutes, 0, 0);
+
+      // If prayer time already passed today, it's for tomorrow
+      if (prayerTime <= now) {
+        prayerTime.setDate(prayerTime.getDate() + 1);
+      }
+
+      const msUntilPrayer = prayerTime.getTime() - now.getTime();
+
+      // Add 1 second buffer to ensure we're past the prayer time
+      return setTimeout(() => {
+        updateNextPrayer();
+        // Schedule the next one
+        const nextTimeout = scheduleNextUpdate();
+        if (nextTimeout) timeoutRef = nextTimeout;
+      }, msUntilPrayer + 1000);
+    };
+
+    let timeoutRef = scheduleNextUpdate();
+
+    return () => {
+      if (timeoutRef) clearTimeout(timeoutRef);
+    };
   }, [prayerDict]);
 
   // Updates nextPrayer when prayer screen is focused

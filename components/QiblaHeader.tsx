@@ -1,7 +1,10 @@
 import { darkModeColors, lightModeColors } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
+import { useAnimatedBackgroundColor } from "@/hooks/useAnimatedColor";
 import React from "react";
-import { Dimensions, Image, Text, View } from "react-native";
+import { Dimensions, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { AnimatedCrossfadeImage } from "./AnimatedCrossfadeImage";
 
 const { height } = Dimensions.get("window");
 
@@ -19,23 +22,19 @@ export const QiblaHeader = ({
   nextPrayer,
 }: QiblaHeaderProps) => {
   const { isDarkMode } = useThemeColors();
+  const bgColor = isDarkMode
+    ? darkModeColors.background
+    : lightModeColors.background;
+  const animatedBgStyle = useAnimatedBackgroundColor(bgColor);
+
   return (
     <>
-      <Image
-        source={backgroundImage}
-        className="absolute top-0 left-0 w-full h-full"
-        resizeMode="cover"
-      />
+      <AnimatedCrossfadeImage source={backgroundImage} resizeMode="cover" />
 
       {/* White/Dark rounded section */}
-      <View
+      <Animated.View
         className="absolute bottom-0 left-0 right-0 rounded-t-3xl"
-        style={{
-          height: height * 0.455,
-          backgroundColor: isDarkMode
-            ? darkModeColors.background
-            : lightModeColors.background,
-        }}
+        style={[{ height: height * 0.455 }, animatedBgStyle]}
       />
       {/* Location display */}
       <View className="absolute left-0 right-0 items-center pt-24">

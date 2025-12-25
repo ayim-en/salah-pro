@@ -1,5 +1,6 @@
 import { CalendarCard, CalendarCardRef } from "@/components/CalendarCard";
 import { CalendarHeader } from "@/components/CalendarHeader";
+import { DebugPrayerPicker } from "@/components/DebugPrayerPicker";
 import { HolidayBottomSheet } from "@/components/HolidayBottomSheet";
 import {
   darkModeColors,
@@ -22,8 +23,13 @@ import {
 } from "@/utils/calendarHelpers";
 import { useNavigation } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Easing, Pressable, Text, View } from "react-native";
-import { Icon } from "react-native-ui-lib";
+import { Animated, Easing, Pressable, View } from "react-native";
+import Reanimated from "react-native-reanimated";
+import { AnimatedTintIcon } from "@/components/AnimatedTintIcon";
+import {
+  useAnimatedBackgroundColor,
+  useAnimatedTextColor,
+} from "@/hooks/useAnimatedColor";
 
 // Animation constants
 const ANIMATION_DURATION_IN = 250;
@@ -37,6 +43,11 @@ export default function CalendarScreen() {
   const [isHolidaySheetOpen, setIsHolidaySheetOpen] = useState(false);
   const [sheetHolidays, setSheetHolidays] = useState<string[]>([]);
   const { colors, debugPrayer, isDarkMode } = useThemeColors();
+  const bgColor = isDarkMode
+    ? darkModeColors.background
+    : lightModeColors.background;
+  const animatedBgStyle = useAnimatedBackgroundColor(bgColor);
+  const animatedActiveTextStyle = useAnimatedTextColor(colors.active);
   const { location, locationName } = useLocation();
   const { nextPrayer } = usePrayerTimes(location);
   const [holidayMarks, setHolidayMarks] = useState<Record<string, any>>({});
@@ -144,6 +155,7 @@ export default function CalendarScreen() {
 
   return (
     <View className="flex-1">
+      <DebugPrayerPicker />
       <CalendarHeader
         locationName={locationName}
         backgroundImage={backgroundImage}
@@ -164,27 +176,26 @@ export default function CalendarScreen() {
                 setSheetHolidays(displayedHolidays);
                 setIsHolidaySheetOpen(true);
               }}
-              className="rounded-2xl p-4 flex-row gap-2 items-center"
-              style={{
-                backgroundColor: isDarkMode
-                  ? darkModeColors.background
-                  : lightModeColors.background,
-              }}
             >
-              {displayedHolidays.map((holiday: string, index: number) => (
-                <Text
-                  key={index}
-                  className="text-center text-xl font-semibold"
-                  style={{ color: colors.active }}
-                >
-                  {holiday}
-                </Text>
-              ))}
-              <Icon
-                source={require("../../assets/images/prayer-pro-icons/calendar-tab/calendar-info.png")}
-                tintColor={colors.active}
-                size={24}
-              />
+              <Reanimated.View
+                className="rounded-2xl p-4 flex-row gap-2 items-center"
+                style={animatedBgStyle}
+              >
+                {displayedHolidays.map((holiday: string, index: number) => (
+                  <Reanimated.Text
+                    key={index}
+                    className="text-center text-xl font-semibold"
+                    style={animatedActiveTextStyle}
+                  >
+                    {holiday}
+                  </Reanimated.Text>
+                ))}
+                <AnimatedTintIcon
+                  source={require("../../assets/images/prayer-pro-icons/calendar-tab/calendar-info.png")}
+                  tintColor={colors.active}
+                  size={24}
+                />
+              </Reanimated.View>
             </Pressable>
           </Animated.View>
           <CalendarCard
@@ -206,14 +217,9 @@ export default function CalendarScreen() {
         colors={colors}
         onClose={() => setIsHolidaySheetOpen(false)}
       />
-      <View
+      <Reanimated.View
         className="absolute bottom-0 left-0 right-0 rounded-t-3xl"
-        style={{
-          height: 10,
-          backgroundColor: isDarkMode
-            ? darkModeColors.background
-            : lightModeColors.background,
-        }}
+        style={[{ height: 10 }, animatedBgStyle]}
       />
     </View>
   );

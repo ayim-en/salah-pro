@@ -1,8 +1,10 @@
 import { CURRENT_MONTH_INDEX } from "@/constants/calendar";
 import { darkModeColors, lightModeColors } from "@/constants/prayers";
+import { useAnimatedBackgroundColor } from "@/hooks/useAnimatedColor";
 import { generateCarouselMonths } from "@/utils/calendarHelpers";
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
-import { Dimensions, View } from "react-native";
+import { Dimensions } from "react-native";
+import Animated from "react-native-reanimated";
 import { Carousel } from "react-native-ui-lib";
 import { MonthCalendar } from "./MonthCalendar";
 
@@ -39,6 +41,7 @@ export const CalendarCard = forwardRef<CalendarCardRef, CalendarCardProps>(
     const bgColor = isDarkMode
       ? darkModeColors.background
       : lightModeColors.background;
+    const animatedBgStyle = useAnimatedBackgroundColor(bgColor);
     const dayTextColor = isDarkMode ? darkModeColors.text : colors.active;
     const disabledTextColor = isDarkMode
       ? darkModeColors.disabledText
@@ -48,9 +51,9 @@ export const CalendarCard = forwardRef<CalendarCardRef, CalendarCardProps>(
       : lightModeColors.sectionTitle;
 
     return (
-      <View
+      <Animated.View
         className="rounded-3xl overflow-hidden pt-4"
-        style={{ width: width, height: width, backgroundColor: bgColor }}
+        style={[{ width: width, height: width }, animatedBgStyle]}
       >
         <Carousel
           ref={carouselRef}
@@ -74,7 +77,7 @@ export const CalendarCard = forwardRef<CalendarCardRef, CalendarCardProps>(
             />
           ))}
         </Carousel>
-      </View>
+      </Animated.View>
     );
   }
 );

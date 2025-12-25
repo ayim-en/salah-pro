@@ -1,3 +1,4 @@
+import { DebugPrayerPicker } from "@/components/DebugPrayerPicker";
 import { QiblaCompass } from "@/components/QiblaCompass";
 import { QiblaHeader } from "@/components/QiblaHeader";
 import {
@@ -12,8 +13,10 @@ import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { useQiblaDirection } from "@/hooks/useQiblaDirection";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { useAnimatedTextColor } from "@/hooks/useAnimatedColor";
 import React, { useEffect, useRef } from "react";
 import { ActivityIndicator, Text, Vibration, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 export default function Qibla() {
   const { location, locationName, error: locationError } = useLocation();
@@ -23,6 +26,10 @@ export default function Qibla() {
   const { colors, debugPrayer, isDarkMode } = useThemeColors();
   const isFacingKaabaRef = useRef(false);
   const isFocused = useIsFocused();
+
+  // Animated text styles for guidance
+  const animatedInactiveTextStyle = useAnimatedTextColor(colors.inactive);
+  const animatedActiveTextStyle = useAnimatedTextColor(colors.active);
 
   const error = locationError || qiblaError;
 
@@ -93,6 +100,7 @@ export default function Qibla() {
   return (
     <View className="flex-1">
       <StatusBar style="light" />
+      <DebugPrayerPicker />
       <QiblaHeader
         qiblaDirection={qiblaData?.direction ?? null}
         locationName={locationName}
@@ -140,18 +148,18 @@ export default function Qibla() {
 
             return (
               <View className="flex-row justify-center">
-                <Text
+                <Animated.Text
                   className=" font-bold text-center text-[40px]"
-                  style={{ color: colors.inactive }}
+                  style={animatedInactiveTextStyle}
                 >
                   {guidance}
-                </Text>
-                <Text
+                </Animated.Text>
+                <Animated.Text
                   className=" font-bold text-center text-[40px]"
-                  style={{ color: colors.active }}
+                  style={animatedActiveTextStyle}
                 >
                   {directionWord}
-                </Text>
+                </Animated.Text>
               </View>
             );
           })()}

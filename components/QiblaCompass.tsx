@@ -1,7 +1,14 @@
+import { AnimatedTintIcon } from "@/components/AnimatedTintIcon";
 import { darkModeColors, lightModeColors } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
+import {
+  useAnimatedBackgroundColor,
+  useAnimatedBorderColor,
+  useAnimatedTextColor,
+} from "@/hooks/useAnimatedColor";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { View } from "react-native";
+import Animated from "react-native-reanimated";
 
 interface QiblaCompassProps {
   magnetometer: number;
@@ -28,45 +35,54 @@ export const QiblaCompass = ({
     ? darkModeColors.textTertiary
     : lightModeColors.textSecondary;
 
+  // Animated styles
+  const animatedBgStyle = useAnimatedBackgroundColor(compassBgColor);
+  const animatedBorderStyle = useAnimatedBorderColor(colors.inactive);
+  const animatedNorthTextStyle = useAnimatedTextColor(colors.active);
+  const animatedDirectionTextStyle = useAnimatedTextColor(directionTextColor);
+
   return (
     <View className="w-96 h-96 items-center justify-center">
-      <View
+      <Animated.View
         className="w-full h-full rounded-full border-8 items-center justify-center"
-        style={{
-          transform: [{ rotate: `${-magnetometer}deg` }],
-          borderColor: colors.inactive,
-          backgroundColor: compassBgColor,
-        }}
+        style={[
+          { transform: [{ rotate: `${-magnetometer}deg` }] },
+          animatedBorderStyle,
+          animatedBgStyle,
+        ]}
       >
         <View className="absolute top-2">
-          <Text className="text-3xl font-bold" style={{ color: colors.active }}>
+          <Animated.Text
+            className="text-3xl font-bold"
+            style={animatedNorthTextStyle}
+          >
             N
-          </Text>
+          </Animated.Text>
         </View>
 
         <View className="absolute right-2">
-          <Text
+          <Animated.Text
             className="text-3xl font-bold"
-            style={{ color: directionTextColor }}
+            style={animatedDirectionTextStyle}
           >
             E
-          </Text>
+          </Animated.Text>
         </View>
         <View className="absolute bottom-2">
-          <Text
+          <Animated.Text
             className="text-3xl font-bold"
-            style={{ color: directionTextColor }}
+            style={animatedDirectionTextStyle}
           >
             S
-          </Text>
+          </Animated.Text>
         </View>
         <View className="absolute left-2">
-          <Text
+          <Animated.Text
             className="text-3xl font-bold"
-            style={{ color: directionTextColor }}
+            style={animatedDirectionTextStyle}
           >
             W
-          </Text>
+          </Animated.Text>
         </View>
 
         <View
@@ -75,27 +91,22 @@ export const QiblaCompass = ({
             transform: [{ translateX }, { translateY }],
           }}
         >
-          <Image
+          <AnimatedTintIcon
             source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-kaaba.png")}
-            className="w-10 h-10"
-            style={{
-              tintColor: colors.inactive,
-            }}
-            resizeMode="contain"
+            size={40}
+            tintColor={colors.inactive}
           />
         </View>
-      </View>
+      </Animated.View>
 
       <View className="absolute inset-0 items-center justify-center">
-        <Image
-          source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-arrow.png")}
-          className="w-14 h-14"
-          style={{
-            tintColor: colors.active,
-            transform: [{ rotate: "180deg" }], // Arrow icon points down
-          }}
-          resizeMode="contain"
-        />
+        <View style={{ transform: [{ rotate: "180deg" }] }}>
+          <AnimatedTintIcon
+            source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-arrow.png")}
+            size={56}
+            tintColor={colors.active}
+          />
+        </View>
       </View>
     </View>
   );
