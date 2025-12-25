@@ -26,8 +26,7 @@ function TabBarBackground() {
 }
 
 export default function TabLayout() {
-  const { colors, isDarkMode, setColors, debugPrayer, setCurrentPrayer } =
-    useThemeColors();
+  const { colors, setColors, debugPrayer, setCurrentPrayer } = useThemeColors();
   const { location } = useLocation();
   const { nextPrayer } = usePrayerTimes(location);
 

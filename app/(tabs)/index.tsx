@@ -92,6 +92,13 @@ export default function Index() {
                 ?.active || "#568FAF"
             : "#568FAF"
         }
+        inactiveColor={
+          displayPrayer
+            ? prayerThemeColors[displayPrayer as keyof typeof prayerThemeColors]
+                ?.inactive || "#8398a3"
+            : "#8398a3"
+        }
+        nextPrayer={displayPrayer || null}
         isDarkMode={isDarkMode}
       />
     </View>

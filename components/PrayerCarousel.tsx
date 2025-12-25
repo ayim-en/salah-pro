@@ -7,7 +7,7 @@ import {
 import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { cleanTimeString, formatDate } from "@/utils/prayerHelpers";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import { Dimensions, Pressable, Text, View } from "react-native";
+import { Dimensions, Pressable, Text, Vibration, View } from "react-native";
 import { Carousel } from "react-native-ui-lib";
 import { AnimatedTintIcon } from "./AnimatedTintIcon";
 
@@ -26,6 +26,8 @@ interface PrayerCarouselProps {
   notificationsEnabled: Record<string, boolean>;
   onToggleNotification: (prayer: string) => void;
   activeColor: string;
+  inactiveColor: string;
+  nextPrayer: string | null;
   isDarkMode?: boolean;
 }
 
@@ -48,6 +50,8 @@ export const PrayerCarousel = forwardRef<
       notificationsEnabled,
       onToggleNotification,
       activeColor,
+      inactiveColor,
+      nextPrayer,
       isDarkMode = false,
     },
     ref
@@ -128,7 +132,9 @@ export const PrayerCarousel = forwardRef<
                           <AnimatedTintIcon
                             source={prayerIcons[prayer]}
                             size={24}
-                            tintColor={activeColor}
+                            tintColor={
+                              prayer === nextPrayer ? activeColor : inactiveColor
+                            }
                           />
                           <Text
                             style={{
@@ -147,7 +153,10 @@ export const PrayerCarousel = forwardRef<
                             {cleanTimeString(dayPrayers.timings[prayer])}
                           </Text>
                           <Pressable
-                            onPress={() => onToggleNotification(prayer)}
+                            onPress={() => {
+                              onToggleNotification(prayer);
+                              setTimeout(() => Vibration.vibrate(50), 100);
+                            }}
                           >
                             <AnimatedTintIcon
                               source={
@@ -156,7 +165,9 @@ export const PrayerCarousel = forwardRef<
                                   : require("../assets/images/prayer-pro-icons/home-page/icon-notify-off.png")
                               }
                               size={24}
-                              tintColor={activeColor}
+                              tintColor={
+                                prayer === nextPrayer ? activeColor : inactiveColor
+                              }
                             />
                           </Pressable>
                         </View>
