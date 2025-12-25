@@ -61,7 +61,9 @@ export const QiblaHeader = ({
             }}
           >
             {nextPrayer
-              ? `Upcoming Prayer: ${nextPrayer.prayer}`
+              ? nextPrayer.prayer === "Sunrise"
+                ? "Upcoming: Sunrise"
+                : `Upcoming Prayer: ${nextPrayer.prayer}`
               : "Loading upcoming prayer..."}
           </Text>
         </View>

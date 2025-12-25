@@ -174,8 +174,8 @@ export const fetchNextIncludedHijriHoliday = async (
             
             allDays = calendars.flat();
 
-            // Only cache if we got most months (at least 10 of 12)
-            if (calendars.length >= 10) {
+            // Only cache if we got most months (at least 20 of 25)
+            if (calendars.length >= 20) {
                 await cacheCalendar(allDays);
             }
         }

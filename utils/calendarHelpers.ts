@@ -24,25 +24,16 @@ export const getTodayISO = (): string => {
   return getLocalISODate(new Date());
 };
 
-// Generate array of months to fetch for the current calendar year and next year
+// Generate array of months to fetch (12 months before and 12 months after current month)
 export const getMonthsForCurrentYear = (): { month: number; year: number }[] => {
   const today = new Date();
-  const currentYear = today.getFullYear();
   const monthsToFetch = [];
 
-  // Fetch all months for current year
-  for (let month = 1; month <= 12; month++) {
+  for (let i = -PAST_MONTHS; i <= FUTURE_MONTHS; i++) {
+    const date = new Date(today.getFullYear(), today.getMonth() + i, 1);
     monthsToFetch.push({
-      month,
-      year: currentYear
-    });
-  }
-
-  // Also fetch all months for next year so a holiday will be displayed at the end of the year
-  for (let month = 1; month <= 12; month++) {
-    monthsToFetch.push({
-      month,
-      year: currentYear + 1
+      month: date.getMonth() + 1,
+      year: date.getFullYear()
     });
   }
 

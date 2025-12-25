@@ -44,7 +44,9 @@ export const PrayerHeader = ({
           }}
         >
           {nextPrayer
-            ? `Upcoming Prayer: ${nextPrayer.prayer}`
+            ? nextPrayer.prayer === "Sunrise"
+              ? "Upcoming: Sunrise"
+              : `Upcoming Prayer: ${nextPrayer.prayer}`
             : "Loading prayer times..."}
         </Text>
         <Text

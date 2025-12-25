@@ -63,10 +63,7 @@ export const getNextPrayer = (
   const todayPrayers = prayerDict[todayISO];
   if (!todayPrayers) return null;
 
-  // Removes Sunrise from the upcoming prayers logic
-  const fardPrayers = Prayers.filter((p) => p !== "Sunrise");
-
-  for (const prayer of fardPrayers) {
+  for (const prayer of Prayers) {
     const prayerTime = todayPrayers.timings[prayer];
     const prayerMinutes = prayerTimeToMinutes(prayerTime);
 

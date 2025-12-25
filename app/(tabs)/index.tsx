@@ -37,7 +37,8 @@ export default function Index() {
     todayIndex,
     nextPrayer,
   } = usePrayerTimes(location);
-  const { notificationsEnabled, toggleNotification } = useNotifications(prayerDict);
+  const { notificationsEnabled, toggleNotification } =
+    useNotifications(prayerDict);
 
   const error = locationError || prayerError;
 
@@ -91,7 +92,7 @@ export default function Index() {
   if (error) return <Text className="color-red-600 m-4">{error}</Text>;
 
   return (
-    <View className="flex-1 bg-blue-500">
+    <View className="flex-1">
       <StatusBar style="light" />
 
       {/* DEBUG: Floating button to toggle prayer theme picker */}

@@ -60,7 +60,7 @@ export const schedulePrayerNotification = async (
     const isSunrise = prayer === "Sunrise";
     const title = isSunrise ? "Sunrise" : `${prayer} Prayer Time`;
     const body = isSunrise
-      ? "The sun is rising — Fajr prayer time has ended"
+      ? "The sun is rising; The time for Fajr prayer has passed"
       : `It's time for ${prayer} prayer`;
 
     const identifier = await Notifications.scheduleNotificationAsync({
