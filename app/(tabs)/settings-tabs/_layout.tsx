@@ -8,25 +8,7 @@ export default function SettingsStack() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="index" options={{}} />
-      <Stack.Screen
-        name="(tabs)/settings-notifications"
-        options={{
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="(tabs)/settings-prayer-times"
-        options={{
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="(tabs)/settings-calendar"
-        options={{
-          headerShown: true,
-        }}
-      />
+      <Stack.Screen name="index" />
     </Stack>
   );
 }
