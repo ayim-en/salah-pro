@@ -12,14 +12,14 @@ interface QiblaHeaderProps {
   qiblaDirection: number | null;
   locationName: string;
   backgroundImage: any;
-  nextPrayer?: { prayer: string } | null;
+  currentPrayer?: { prayer: string } | null;
 }
 
 export const QiblaHeader = ({
   qiblaDirection,
   locationName,
   backgroundImage,
-  nextPrayer,
+  currentPrayer,
 }: QiblaHeaderProps) => {
   const { isDarkMode } = useThemeColors();
   const bgColor = isDarkMode
@@ -59,11 +59,11 @@ export const QiblaHeader = ({
               textShadowRadius: 2,
             }}
           >
-            {nextPrayer
-              ? nextPrayer.prayer === "Sunrise"
-                ? "Upcoming: Sunrise"
-                : `Upcoming Prayer: ${nextPrayer.prayer}`
-              : "Loading upcoming prayer..."}
+            {currentPrayer
+              ? currentPrayer.prayer === "Sunrise"
+                ? "Current: Sunrise"
+                : `Current Prayer: ${currentPrayer.prayer}`
+              : "Loading current prayer..."}
           </Text>
         </View>
       </View>

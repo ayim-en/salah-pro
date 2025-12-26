@@ -28,7 +28,7 @@ export default function Index() {
     sortedDates,
     todayISO,
     todayIndex,
-    nextPrayer,
+    currentPrayer,
   } = usePrayerTimes(location);
   const { notificationsEnabled, toggleNotification } =
     useNotifications(prayerDict);
@@ -59,11 +59,11 @@ export default function Index() {
     return unsubscribe;
   }, [navigation, scrollToToday]);
 
-  // Determine which prayer to display (debug override or actual next prayer)
-  const displayPrayer = debugPrayer || nextPrayer?.prayer;
+  // Determine which prayer to display (debug override or actual current prayer)
+  const displayPrayer = debugPrayer || currentPrayer?.prayer;
   const displayPrayerObj = debugPrayer
-    ? { prayer: debugPrayer, time: nextPrayer?.time || "--:--" }
-    : nextPrayer;
+    ? { prayer: debugPrayer, time: currentPrayer?.time || "--:--" }
+    : currentPrayer;
 
   if (loading) return <ActivityIndicator className="mt-12" />;
   if (error) return <Text className="color-red-600 m-4">{error}</Text>;
@@ -73,7 +73,7 @@ export default function Index() {
       <StatusBar style="light" />
       <DebugPrayerPicker />
       <PrayerHeader
-        nextPrayer={displayPrayerObj}
+        currentPrayer={displayPrayerObj}
         locationName={locationName}
       />
       <PrayerCarousel
@@ -98,7 +98,7 @@ export default function Index() {
                 ?.inactive || "#8398a3"
             : "#8398a3"
         }
-        nextPrayer={displayPrayer || null}
+        currentPrayer={displayPrayer || null}
         isDarkMode={isDarkMode}
       />
     </View>

@@ -1,6 +1,7 @@
+import { Prayers } from "@/constants/prayers";
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { getLocalISODate } from "@/utils/calendarHelpers";
-import { getNextPrayer } from "@/utils/prayerHelpers";
+import { getCurrentPrayer } from "@/utils/prayerHelpers";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -57,44 +58,70 @@ export const usePrayerTimes = (location: Location.LocationObject | null) => {
     [sortedDates, todayISO]
   );
 
-  // State that holds the next upcoming prayer and its time
-  const [nextPrayer, setNextPrayer] = useState<{
+  // State that holds the current prayer and its time
+  const [currentPrayer, setCurrentPrayer] = useState<{
     prayer: string;
     time: string;
   } | null>(null);
 
-  // Updates nextPrayer when prayerDict changes and schedules update for next prayer time
+  // Updates currentPrayer when prayerDict changes and schedules update for next prayer time
   useEffect(() => {
     if (Object.keys(prayerDict).length === 0) return;
 
-    const updateNextPrayer = () => {
-      setNextPrayer(getNextPrayer(prayerDict));
+    const updateCurrentPrayer = () => {
+      setCurrentPrayer(getCurrentPrayer(prayerDict));
     };
 
     // Initial update
-    updateNextPrayer();
+    updateCurrentPrayer();
 
-    // Schedule timeout for when the current next prayer time arrives
+    // Schedule timeout for when the next prayer time arrives (to update current prayer)
     const scheduleNextUpdate = () => {
-      const current = getNextPrayer(prayerDict);
-      if (!current?.time) return null;
+      const todayISO = getLocalISODate(new Date());
+      const todayPrayers = prayerDict[todayISO];
+      if (!todayPrayers) return null;
 
-      // Parse the prayer time (HH:MM format)
-      const [hours, minutes] = current.time.split(":").map(Number);
       const now = new Date();
-      const prayerTime = new Date();
-      prayerTime.setHours(hours, minutes, 0, 0);
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-      // If prayer time already passed today, it's for tomorrow
-      if (prayerTime <= now) {
-        prayerTime.setDate(prayerTime.getDate() + 1);
+      // Find the next prayer that hasn't started yet
+      let nextPrayerTime: Date | null = null;
+
+      for (const prayer of Prayers) {
+        const timeStr = todayPrayers.timings[prayer];
+        const cleanTime = timeStr.split(" ")[0];
+        const [hours, minutes] = cleanTime.split(":").map(Number);
+        const prayerMinutes = hours * 60 + minutes;
+
+        if (prayerMinutes > currentMinutes) {
+          nextPrayerTime = new Date();
+          nextPrayerTime.setHours(hours, minutes, 0, 0);
+          break;
+        }
       }
 
-      const msUntilPrayer = prayerTime.getTime() - now.getTime();
+      // If no more prayers today, schedule for Fajr tomorrow
+      if (!nextPrayerTime) {
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowISO = getLocalISODate(tomorrow);
+        const tomorrowPrayers = prayerDict[tomorrowISO];
+
+        if (tomorrowPrayers) {
+          const fajrTime = tomorrowPrayers.timings.Fajr.split(" ")[0];
+          const [hours, minutes] = fajrTime.split(":").map(Number);
+          nextPrayerTime = new Date(tomorrow);
+          nextPrayerTime.setHours(hours, minutes, 0, 0);
+        }
+      }
+
+      if (!nextPrayerTime) return null;
+
+      const msUntilPrayer = nextPrayerTime.getTime() - now.getTime();
 
       // Add 1 second buffer to ensure we're past the prayer time
       return setTimeout(() => {
-        updateNextPrayer();
+        updateCurrentPrayer();
         // Schedule the next one
         const nextTimeout = scheduleNextUpdate();
         if (nextTimeout) timeoutRef = nextTimeout;
@@ -108,11 +135,11 @@ export const usePrayerTimes = (location: Location.LocationObject | null) => {
     };
   }, [prayerDict]);
 
-  // Updates nextPrayer when prayer screen is focused
+  // Updates currentPrayer when prayer screen is focused
   useFocusEffect(
     useCallback(() => {
       if (Object.keys(prayerDict).length > 0) {
-        setNextPrayer(getNextPrayer(prayerDict));
+        setCurrentPrayer(getCurrentPrayer(prayerDict));
       }
     }, [prayerDict])
   );
@@ -124,6 +151,6 @@ export const usePrayerTimes = (location: Location.LocationObject | null) => {
     sortedDates,
     todayISO,
     todayIndex,
-    nextPrayer,
+    currentPrayer,
   };
 };

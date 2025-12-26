@@ -13,19 +13,19 @@ import { AnimatedCrossfadeImage } from "./AnimatedCrossfadeImage";
 
 const { height } = Dimensions.get("window");
 
-interface UpcomingPrayerHeaderProps {
-  nextPrayer: { prayer: string; time: string } | null;
+interface CurrentPrayerHeaderProps {
+  currentPrayer: { prayer: string; time: string } | null;
   locationName: string;
 }
 
 export const PrayerHeader = ({
-  nextPrayer,
+  currentPrayer,
   locationName,
-}: UpcomingPrayerHeaderProps) => {
+}: CurrentPrayerHeaderProps) => {
   const { isDarkMode } = useThemeColors();
-  // Get the background image based on the upcoming prayer
-  const backgroundImage = nextPrayer?.prayer
-    ? prayerBackgrounds[nextPrayer.prayer] || prayerBackgrounds.Fajr
+  // Get the background image based on the current prayer
+  const backgroundImage = currentPrayer?.prayer
+    ? prayerBackgrounds[currentPrayer.prayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
 
   const bgColor = isDarkMode
@@ -46,10 +46,10 @@ export const PrayerHeader = ({
             textShadowRadius: 2,
           }}
         >
-          {nextPrayer
-            ? nextPrayer.prayer === "Sunrise"
-              ? "Upcoming: Sunrise"
-              : `Upcoming Prayer: ${nextPrayer.prayer}`
+          {currentPrayer
+            ? currentPrayer.prayer === "Sunrise"
+              ? "Current: Sunrise"
+              : `Current Prayer: ${currentPrayer.prayer}`
             : "Loading prayer times..."}
         </Text>
         <Text
@@ -60,7 +60,7 @@ export const PrayerHeader = ({
             textShadowRadius: 4,
           }}
         >
-          {nextPrayer ? nextPrayer.time : "--:--"}
+          {currentPrayer ? currentPrayer.time : "--:--"}
         </Text>
         <View className="flex-row items-center gap-1">
           <Text

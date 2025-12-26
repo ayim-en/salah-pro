@@ -5,14 +5,14 @@ import { Text, View } from "react-native";
 import { AnimatedCrossfadeImage } from "./AnimatedCrossfadeImage";
 
 interface CalendarHeaderProps {
-  nextPrayer: { prayer: string; time: string } | null;
+  currentPrayer: { prayer: string; time: string } | null;
   locationName: string;
   backgroundImage: any;
   nextHoliday: NextHijriHolidayData | null;
 }
 
 export const CalendarHeader = ({
-  nextPrayer,
+  currentPrayer,
   locationName,
   backgroundImage,
   nextHoliday,

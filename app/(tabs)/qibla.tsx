@@ -21,7 +21,7 @@ import Animated from "react-native-reanimated";
 export default function Qibla() {
   const { location, locationName, error: locationError } = useLocation();
   const { qiblaData, loading, error: qiblaError } = useQiblaDirection(location);
-  const { nextPrayer } = usePrayerTimes(location);
+  const { currentPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
   const { colors, debugPrayer, isDarkMode } = useThemeColors();
   const isFacingKaabaRef = useRef(false);
@@ -33,8 +33,8 @@ export default function Qibla() {
 
   const error = locationError || qiblaError;
 
-  // Use debug prayer if set, otherwise use actual next prayer
-  const displayPrayer = debugPrayer || nextPrayer?.prayer;
+  // Use debug prayer if set, otherwise use actual current prayer
+  const displayPrayer = debugPrayer || currentPrayer?.prayer;
 
   // Vibration only when on qibla tab
   useEffect(() => {
@@ -105,7 +105,7 @@ export default function Qibla() {
         qiblaDirection={qiblaData?.direction ?? null}
         locationName={locationName}
         backgroundImage={backgroundImage}
-        nextPrayer={nextPrayer}
+        currentPrayer={currentPrayer}
       />
 
       {qiblaData && (

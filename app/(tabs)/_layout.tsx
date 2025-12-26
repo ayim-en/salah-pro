@@ -28,12 +28,12 @@ function TabBarBackground() {
 export default function TabLayout() {
   const { colors, setColors, debugPrayer, setCurrentPrayer } = useThemeColors();
   const { location } = useLocation();
-  const { nextPrayer } = usePrayerTimes(location);
+  const { currentPrayer } = usePrayerTimes(location);
 
-  // Update theme colors based on upcoming prayer (only if not in debug mode)
+  // Update theme colors based on current prayer (only if not in debug mode)
   useEffect(() => {
-    if (!debugPrayer && nextPrayer?.prayer) {
-      const prayerName = nextPrayer.prayer as keyof typeof prayerThemeColors;
+    if (!debugPrayer && currentPrayer?.prayer) {
+      const prayerName = currentPrayer.prayer as keyof typeof prayerThemeColors;
       const themeColors = prayerThemeColors[prayerName];
       if (themeColors) {
         setColors({
@@ -41,9 +41,9 @@ export default function TabLayout() {
           inactive: themeColors.inactive,
         });
       }
-      setCurrentPrayer(nextPrayer.prayer as any);
+      setCurrentPrayer(currentPrayer.prayer as any);
     }
-  }, [nextPrayer, setColors, debugPrayer, setCurrentPrayer]);
+  }, [currentPrayer, setColors, debugPrayer, setCurrentPrayer]);
 
   return (
     <Tabs

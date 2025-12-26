@@ -52,8 +52,9 @@ export const prayerTimeToMinutes = (prayerTime: string): number => {
   return hours * 60 + minutes;
 };
 
-// Determines the next upcoming prayer based on current time
-export const getNextPrayer = (
+// Determines the current prayer based on current time
+// Returns the prayer that has started most recently (its time has passed)
+export const getCurrentPrayer = (
   prayerDict: PrayerDict
 ): { prayer: string; time: string } | null => {
   const now = new Date();
@@ -63,30 +64,36 @@ export const getNextPrayer = (
   const todayPrayers = prayerDict[todayISO];
   if (!todayPrayers) return null;
 
-  for (const prayer of Prayers) {
+  // Find the most recent prayer that has started (iterate in reverse)
+  for (let i = Prayers.length - 1; i >= 0; i--) {
+    const prayer = Prayers[i];
     const prayerTime = todayPrayers.timings[prayer];
     const prayerMinutes = prayerTimeToMinutes(prayerTime);
 
-    if (prayerMinutes > currentMinutes) {
+    if (prayerMinutes <= currentMinutes) {
       return { prayer, time: cleanTimeString(prayerTime) };
     }
   }
 
-  // If no more prayers today, return Fajr of tomorrow
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  // If no prayer has started yet today (before Fajr), return Isha from yesterday
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
 
-  const tomorrowISO = getLocalISODate(tomorrow);
-  const tomorrowPrayers = prayerDict[tomorrowISO];
+  const yesterdayISO = getLocalISODate(yesterday);
+  const yesterdayPrayers = prayerDict[yesterdayISO];
 
-  if (tomorrowPrayers) {
+  if (yesterdayPrayers) {
     return {
-      prayer: "Fajr",
-      time: cleanTimeString(tomorrowPrayers.timings.Fajr),
+      prayer: "Isha",
+      time: cleanTimeString(yesterdayPrayers.timings.Isha),
     };
   }
 
-  return null;
+  // Fallback to Isha from today if yesterday not available
+  return {
+    prayer: "Isha",
+    time: cleanTimeString(todayPrayers.timings.Isha),
+  };
 };
 
 // Convert degrees to cardinal direction (N, NE, E, SE, S, SW, W, NW)

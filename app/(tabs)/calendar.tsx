@@ -49,7 +49,7 @@ export default function CalendarScreen() {
   const animatedBgStyle = useAnimatedBackgroundColor(bgColor);
   const animatedActiveTextStyle = useAnimatedTextColor(colors.active);
   const { location, locationName } = useLocation();
-  const { nextPrayer } = usePrayerTimes(location);
+  const { currentPrayer } = usePrayerTimes(location);
   const [holidayMarks, setHolidayMarks] = useState<Record<string, any>>({});
 
   // Animation state for holiday badge
@@ -75,8 +75,8 @@ export default function CalendarScreen() {
     return unsubscribe;
   }, [navigation, scrollToToday]);
 
-  // Use debug prayer if set, otherwise use actual next prayer
-  const displayPrayer = debugPrayer || nextPrayer?.prayer;
+  // Use debug prayer if set, otherwise use actual current prayer
+  const displayPrayer = debugPrayer || currentPrayer?.prayer;
   const backgroundImage = displayPrayer
     ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
@@ -159,7 +159,7 @@ export default function CalendarScreen() {
       <CalendarHeader
         locationName={locationName}
         backgroundImage={backgroundImage}
-        nextPrayer={nextPrayer}
+        currentPrayer={currentPrayer}
         nextHoliday={nextHoliday}
       />
       <View className="flex-1 items-center justify-center p-4 pt-24">

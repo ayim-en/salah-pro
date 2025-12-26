@@ -27,7 +27,7 @@ interface PrayerCarouselProps {
   onToggleNotification: (prayer: string) => void;
   activeColor: string;
   inactiveColor: string;
-  nextPrayer: string | null;
+  currentPrayer: string | null;
   isDarkMode?: boolean;
 }
 
@@ -51,7 +51,7 @@ export const PrayerCarousel = forwardRef<
       onToggleNotification,
       activeColor,
       inactiveColor,
-      nextPrayer,
+      currentPrayer,
       isDarkMode = false,
     },
     ref
@@ -133,7 +133,7 @@ export const PrayerCarousel = forwardRef<
                             source={prayerIcons[prayer]}
                             size={24}
                             tintColor={
-                              prayer === nextPrayer ? activeColor : inactiveColor
+                              prayer === currentPrayer ? activeColor : inactiveColor
                             }
                           />
                           <Text
@@ -166,7 +166,7 @@ export const PrayerCarousel = forwardRef<
                               }
                               size={24}
                               tintColor={
-                                prayer === nextPrayer ? activeColor : inactiveColor
+                                prayer === currentPrayer ? activeColor : inactiveColor
                               }
                             />
                           </Pressable>
