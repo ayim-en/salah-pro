@@ -1,19 +1,20 @@
 import { AnimatedCrossfadeImage } from "@/components/AnimatedCrossfadeImage";
-import { DebugPrayerPicker } from "@/components/DebugPrayerPicker";
+import { AnimatedTintIcon } from "@/components/AnimatedTintIcon";
 import {
   darkModeColors,
   lightModeColors,
   prayerBackgrounds,
+  Prayers,
+  prayerThemeColors,
 } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
 import {
   useAnimatedBackgroundColor,
   useAnimatedTextColor,
 } from "@/hooks/useAnimatedColor";
-import React, { useCallback, useMemo, useState } from "react";
-import { Platform, Pressable, SectionList, UIManager, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Platform, Pressable, SectionList, TouchableOpacity, UIManager, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { Icon } from "react-native-ui-lib";
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -33,7 +34,7 @@ type SettingsSection = {
 };
 
 export default function SettingsHome() {
-  const { colors, isDarkMode, currentPrayer, debugPrayer } = useThemeColors();
+  const { colors, isDarkMode, currentPrayer, themePrayer, setThemePrayer } = useThemeColors();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set()
   );
@@ -42,8 +43,8 @@ export default function SettingsHome() {
     ? darkModeColors.background
     : lightModeColors.background;
 
-  // Get the background image based on the current prayer
-  const displayPrayer = debugPrayer || currentPrayer;
+  // Get the background image based on theme prayer or current prayer
+  const displayPrayer = themePrayer || currentPrayer;
   const backgroundImage = displayPrayer
     ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
@@ -91,9 +92,65 @@ export default function SettingsHome() {
         {
           id: "themes-content",
           content: (
-            <Animated.Text style={animatedSecondaryTextStyle}>
-              Theme and appearance settings coming soon...
-            </Animated.Text>
+            <View className="flex-row flex-wrap gap-2">
+              {/* Auto option */}
+              <TouchableOpacity
+                onPress={() => setThemePrayer(null)}
+                className="rounded-xl px-4 py-3"
+                style={{
+                  backgroundColor: !themePrayer
+                    ? colors.active
+                    : isDarkMode
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.05)",
+                }}
+              >
+                <Animated.Text
+                  className="font-semibold"
+                  style={{
+                    color: !themePrayer
+                      ? "#fff"
+                      : isDarkMode
+                      ? darkModeColors.textSecondary
+                      : lightModeColors.textSecondary,
+                  }}
+                >
+                  Auto
+                </Animated.Text>
+              </TouchableOpacity>
+              {/* Prayer theme options */}
+              {Prayers.map((prayer) => {
+                const isSelected = themePrayer === prayer;
+                const themeColor = prayerThemeColors[prayer].active;
+                return (
+                  <TouchableOpacity
+                    key={prayer}
+                    onPress={() => setThemePrayer(prayer)}
+                    className="rounded-xl px-4 py-3"
+                    style={{
+                      backgroundColor: isSelected
+                        ? themeColor
+                        : isDarkMode
+                        ? "rgba(255,255,255,0.1)"
+                        : "rgba(0,0,0,0.05)",
+                    }}
+                  >
+                    <Animated.Text
+                      className="font-semibold"
+                      style={{
+                        color: isSelected
+                          ? "#fff"
+                          : isDarkMode
+                          ? darkModeColors.textSecondary
+                          : lightModeColors.textSecondary,
+                      }}
+                    >
+                      {prayer}
+                    </Animated.Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           ),
         },
       ],
@@ -192,7 +249,7 @@ export default function SettingsHome() {
               className="w-10 h-10 rounded-lg items-center justify-center mr-3"
               style={{ backgroundColor: colors.active + "20" }}
             >
-              <Icon source={section.icon} size={22} tintColor={colors.active} />
+              <AnimatedTintIcon source={section.icon} size={22} tintColor={colors.active} />
             </View>
             <Animated.Text
               className="flex-1 text-2xl font-medium"
@@ -250,7 +307,6 @@ export default function SettingsHome() {
   return (
     <View className="flex-1">
       <AnimatedCrossfadeImage source={backgroundImage} resizeMode="cover" />
-      <DebugPrayerPicker />
       <View className="pt-32 pb-4 items-center">
         <Animated.Text
           className="text-7xl font-bold text-white"

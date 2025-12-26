@@ -9,9 +9,9 @@ interface ThemeColors {
 interface ThemeContextType {
   colors: ThemeColors;
   setColors: (colors: ThemeColors) => void;
-  // Debug mode
-  debugPrayer: Prayer | null;
-  setDebugPrayer: (prayer: Prayer | null) => void;
+  // Theme override - allows manual selection of prayer theme
+  themePrayer: Prayer | null;
+  setThemePrayer: (prayer: Prayer | null) => void;
   // Dark mode for Maghrib and Isha
   isDarkMode: boolean;
   currentPrayer: Prayer | null;
@@ -31,42 +31,42 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     inactive: "#8398a3",
   });
 
-  // Debug: allow manual prayer override for testing themes
-  const [debugPrayer, setDebugPrayer] = useState<Prayer | null>(null);
+  // Theme override: allow manual selection of prayer theme
+  const [themePrayer, setThemePrayer] = useState<Prayer | null>(null);
 
   // Track the current prayer for dark mode calculation
   const [currentPrayer, setCurrentPrayer] = useState<Prayer | null>(null);
 
-  // Calculate dark mode based on debug prayer or current prayer
-  const activePrayer = debugPrayer || currentPrayer;
+  // Calculate dark mode based on theme prayer or current prayer
+  const activePrayer = themePrayer || currentPrayer;
   const isDarkMode = activePrayer
     ? DARK_MODE_PRAYERS.includes(activePrayer)
     : false;
 
-  // Override colors when debugPrayer is set
+  // Override colors when themePrayer is set
   const effectiveSetColors = (newColors: ThemeColors) => {
-    if (!debugPrayer) {
+    if (!themePrayer) {
       setColors(newColors);
     }
   };
 
-  // Apply debug prayer colors when debugPrayer changes
+  // Apply theme prayer colors when themePrayer changes
   React.useEffect(() => {
-    if (debugPrayer) {
-      const themeColors = prayerThemeColors[debugPrayer];
+    if (themePrayer) {
+      const themeColors = prayerThemeColors[themePrayer];
       if (themeColors) {
         setColors(themeColors);
       }
     }
-  }, [debugPrayer]);
+  }, [themePrayer]);
 
   return (
     <ThemeContext.Provider
       value={{
         colors,
         setColors: effectiveSetColors,
-        debugPrayer,
-        setDebugPrayer,
+        themePrayer,
+        setThemePrayer,
         isDarkMode,
         currentPrayer,
         setCurrentPrayer,

@@ -1,6 +1,5 @@
 import { CalendarCard, CalendarCardRef } from "@/components/CalendarCard";
 import { CalendarHeader } from "@/components/CalendarHeader";
-import { DebugPrayerPicker } from "@/components/DebugPrayerPicker";
 import { HolidayBottomSheet } from "@/components/HolidayBottomSheet";
 import {
   darkModeColors,
@@ -42,7 +41,7 @@ export default function CalendarScreen() {
   );
   const [isHolidaySheetOpen, setIsHolidaySheetOpen] = useState(false);
   const [sheetHolidays, setSheetHolidays] = useState<string[]>([]);
-  const { colors, debugPrayer, isDarkMode } = useThemeColors();
+  const { colors, themePrayer, isDarkMode } = useThemeColors();
   const bgColor = isDarkMode
     ? darkModeColors.background
     : lightModeColors.background;
@@ -75,8 +74,8 @@ export default function CalendarScreen() {
     return unsubscribe;
   }, [navigation, scrollToToday]);
 
-  // Use debug prayer if set, otherwise use actual current prayer
-  const displayPrayer = debugPrayer || currentPrayer?.prayer;
+  // Use theme prayer if set, otherwise use actual current prayer for background
+  const displayPrayer = themePrayer || currentPrayer?.prayer;
   const backgroundImage = displayPrayer
     ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
@@ -155,7 +154,6 @@ export default function CalendarScreen() {
 
   return (
     <View className="flex-1">
-      <DebugPrayerPicker />
       <CalendarHeader
         locationName={locationName}
         backgroundImage={backgroundImage}

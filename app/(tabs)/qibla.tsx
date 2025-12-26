@@ -1,4 +1,3 @@
-import { DebugPrayerPicker } from "@/components/DebugPrayerPicker";
 import { QiblaCompass } from "@/components/QiblaCompass";
 import { QiblaHeader } from "@/components/QiblaHeader";
 import {
@@ -91,7 +90,7 @@ export default function Qibla() {
   const { qiblaData, loading, error: qiblaError } = useQiblaDirection(location);
   const { currentPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
-  const { colors, debugPrayer, isDarkMode } = useThemeColors();
+  const { colors, themePrayer, isDarkMode } = useThemeColors();
   const isFocused = useIsFocused();
 
   // Animated text styles for guidance
@@ -100,8 +99,8 @@ export default function Qibla() {
 
   const error = locationError || qiblaError;
 
-  // Use debug prayer if set, otherwise use actual current prayer
-  const displayPrayer = debugPrayer || currentPrayer?.prayer;
+  // Use theme prayer if set, otherwise use actual current prayer for background
+  const displayPrayer = themePrayer || currentPrayer?.prayer;
 
   // Track if facing Kaaba for vibration
   const isFacingKaaba = useDerivedValue(() => {
@@ -164,7 +163,6 @@ export default function Qibla() {
   return (
     <View className="flex-1">
       <StatusBar style="light" />
-      <DebugPrayerPicker />
       <QiblaHeader
         qiblaDirection={qiblaData?.direction ?? null}
         locationName={locationName}

@@ -1,4 +1,3 @@
-import { DebugPrayerPicker } from "@/components/DebugPrayerPicker";
 import type { PrayerCarouselRef } from "@/components/PrayerCarousel";
 import { PrayerCarousel } from "@/components/PrayerCarousel";
 import { PrayerHeader } from "@/components/PrayerHeader";
@@ -17,7 +16,7 @@ export default function Index() {
   const [hasSetInitialPage, setHasSetInitialPage] = useState(false);
   const carouselRef = useRef<PrayerCarouselRef>(null);
   const navigation = useNavigation<any>();
-  const { debugPrayer, isDarkMode } = useThemeColors();
+  const { themePrayer, isDarkMode } = useThemeColors();
 
   // Custom hooks to get states
   const { location, locationName, error: locationError } = useLocation();
@@ -59,11 +58,8 @@ export default function Index() {
     return unsubscribe;
   }, [navigation, scrollToToday]);
 
-  // Determine which prayer to display (debug override or actual current prayer)
-  const displayPrayer = debugPrayer || currentPrayer?.prayer;
-  const displayPrayerObj = debugPrayer
-    ? { prayer: debugPrayer, time: currentPrayer?.time || "--:--" }
-    : currentPrayer;
+  // Theme uses override if set, otherwise actual current prayer
+  const themePrayerDisplay = themePrayer || currentPrayer?.prayer;
 
   if (loading) return <ActivityIndicator className="mt-12" />;
   if (error) return <Text className="color-red-600 m-4">{error}</Text>;
@@ -71,9 +67,8 @@ export default function Index() {
   return (
     <View className="flex-1">
       <StatusBar style="light" />
-      <DebugPrayerPicker />
       <PrayerHeader
-        currentPrayer={displayPrayerObj}
+        currentPrayer={currentPrayer}
         locationName={locationName}
       />
       <PrayerCarousel
@@ -87,18 +82,18 @@ export default function Index() {
         notificationsEnabled={notificationsEnabled}
         onToggleNotification={toggleNotification}
         activeColor={
-          displayPrayer
-            ? prayerThemeColors[displayPrayer as keyof typeof prayerThemeColors]
+          themePrayerDisplay
+            ? prayerThemeColors[themePrayerDisplay as keyof typeof prayerThemeColors]
                 ?.active || "#568FAF"
             : "#568FAF"
         }
         inactiveColor={
-          displayPrayer
-            ? prayerThemeColors[displayPrayer as keyof typeof prayerThemeColors]
+          themePrayerDisplay
+            ? prayerThemeColors[themePrayerDisplay as keyof typeof prayerThemeColors]
                 ?.inactive || "#8398a3"
             : "#8398a3"
         }
-        currentPrayer={displayPrayer || null}
+        currentPrayer={currentPrayer?.prayer || null}
         isDarkMode={isDarkMode}
       />
     </View>
