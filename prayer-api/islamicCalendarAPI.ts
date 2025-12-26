@@ -164,7 +164,7 @@ export const fetchNextIncludedHijriHoliday = async (
                     // Continue with other months
                 }
                 // Add small delay between requests to avoid rate limiting
-                await delay(500);
+                await delay(100);
             }
             
             if (calendars.length === 0) {

@@ -1,27 +1,54 @@
 import * as Location from "expo-location";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import {
+  SharedValue,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
-export const useDeviceHeading = () => {
-  const [heading, setHeading] = useState(0);
+// Spring config for smooth rotation
+const SPRING_CONFIG = {
+  damping: 20,
+  stiffness: 90,
+  mass: 0.5,
+};
+
+// Normalize angle difference to handle 360/0 wrap-around
+const normalizeAngleDiff = (current: number, target: number): number => {
+  let diff = target - current;
+  // Handle wrap-around: take the shortest path
+  if (diff > 180) diff -= 360;
+  if (diff < -180) diff += 360;
+  return current + diff;
+};
+
+export const useDeviceHeading = (): SharedValue<number> => {
+  const heading = useSharedValue(0);
+  const lastHeading = useSharedValue(0);
 
   useEffect(() => {
     let subscription: Location.LocationSubscription | null = null;
 
     const startWatchingHeading = async () => {
       try {
-        // Request permission if not already granted
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           console.warn("Location permission not granted for compass");
           return;
         }
 
-        // Watch device heading (compass)
         subscription = await Location.watchHeadingAsync((headingData) => {
-          // magHeading is the magnetic heading in degrees (0-360)
-          // trueHeading is adjusted for magnetic declination (more accurate)
           const compassHeading = headingData.trueHeading ?? headingData.magHeading;
-          setHeading(Math.round(compassHeading));
+
+          // Normalize to handle 360/0 boundary smoothly
+          const normalizedHeading = normalizeAngleDiff(
+            lastHeading.value,
+            compassHeading
+          );
+          lastHeading.value = normalizedHeading;
+
+          // Animate to new heading with spring for smoothness
+          heading.value = withSpring(normalizedHeading, SPRING_CONFIG);
         });
       } catch (error) {
         console.error("Error watching heading:", error);
@@ -35,7 +62,7 @@ export const useDeviceHeading = () => {
         subscription.remove();
       }
     };
-  }, []);
+  }, [heading, lastHeading]);
 
   return heading;
 };

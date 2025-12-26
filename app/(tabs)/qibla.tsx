@@ -7,16 +7,84 @@ import {
   prayerBackgrounds,
 } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
+import { useAnimatedTextColor } from "@/hooks/useAnimatedColor";
 import { useDeviceHeading } from "@/hooks/useDeviceHeading";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { useQiblaDirection } from "@/hooks/useQiblaDirection";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { useAnimatedTextColor } from "@/hooks/useAnimatedColor";
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { ActivityIndicator, Text, Vibration, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, {
+  runOnJS,
+  SharedValue,
+  useAnimatedReaction,
+  useDerivedValue,
+} from "react-native-reanimated";
+
+type GuidanceKey = "kaaba" | "left" | "right";
+
+// Guidance text component that reacts to heading changes
+const GuidanceText = ({
+  qiblaDirection,
+  deviceHeading,
+  animatedInactiveTextStyle,
+  animatedActiveTextStyle,
+}: {
+  qiblaDirection: number;
+  deviceHeading: SharedValue<number>;
+  animatedInactiveTextStyle: any;
+  animatedActiveTextStyle: any;
+}) => {
+  const [guidanceKey, setGuidanceKey] = React.useState<GuidanceKey>("right");
+  const lastKeyRef = React.useRef<GuidanceKey>("right");
+
+  const updateGuidanceKey = React.useCallback((newKey: GuidanceKey) => {
+    if (lastKeyRef.current !== newKey) {
+      lastKeyRef.current = newKey;
+      setGuidanceKey(newKey);
+    }
+  }, []);
+
+  useAnimatedReaction(
+    () => {
+      let angle = qiblaDirection - deviceHeading.value;
+      angle = ((angle + 180) % 360) - 180;
+
+      // Determine guidance key
+      if (Math.abs(angle) < 2.5) {
+        return "kaaba" as GuidanceKey;
+      }
+      const radians = (angle * Math.PI) / 180;
+      return (Math.sin(radians) > 0 ? "right" : "left") as GuidanceKey;
+    },
+    (key) => {
+      runOnJS(updateGuidanceKey)(key);
+    },
+    [qiblaDirection]
+  );
+
+  const guidance = guidanceKey === "kaaba" ? "Facing the " : "Turn to your ";
+  const directionWord = guidanceKey === "kaaba" ? "Kaaba" : guidanceKey;
+
+  return (
+    <View className="flex-row justify-center">
+      <Animated.Text
+        className="font-bold text-center text-[40px]"
+        style={animatedInactiveTextStyle}
+      >
+        {guidance}
+      </Animated.Text>
+      <Animated.Text
+        className="font-bold text-center text-[40px]"
+        style={animatedActiveTextStyle}
+      >
+        {directionWord}
+      </Animated.Text>
+    </View>
+  );
+};
 
 export default function Qibla() {
   const { location, locationName, error: locationError } = useLocation();
@@ -24,7 +92,6 @@ export default function Qibla() {
   const { currentPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
   const { colors, debugPrayer, isDarkMode } = useThemeColors();
-  const isFacingKaabaRef = useRef(false);
   const isFocused = useIsFocused();
 
   // Animated text styles for guidance
@@ -36,33 +103,30 @@ export default function Qibla() {
   // Use debug prayer if set, otherwise use actual current prayer
   const displayPrayer = debugPrayer || currentPrayer?.prayer;
 
-  // Vibration only when on qibla tab
-  useEffect(() => {
-    if (!isFocused) {
-      isFacingKaabaRef.current = false;
-      return;
-    }
-
-    if (!qiblaData || deviceHeading === null) return;
-
-    // Calculate relative angle from device heading to Kaaba
-    let relativeAngle = qiblaData.direction - deviceHeading;
-    // Normalize to -180 to 180 range
+  // Track if facing Kaaba for vibration
+  const isFacingKaaba = useDerivedValue(() => {
+    if (!qiblaData) return false;
+    let relativeAngle = qiblaData.direction - deviceHeading.value;
     relativeAngle = ((relativeAngle + 180) % 360) - 180;
+    return Math.abs(relativeAngle) < 2.5;
+  });
 
-    // Check if facing the Kaaba
-    const isFacingKaaba = Math.abs(relativeAngle) < 2.5;
+  // Vibration effect when facing Kaaba
+  const triggerVibration = React.useCallback(() => {
+    Vibration.vibrate([0, 100, 50, 100]);
+  }, []);
 
-    // Trigger vibration when transitioning to facing Kaaba
-    if (isFacingKaaba && !isFacingKaabaRef.current) {
-      Vibration.vibrate([0, 100, 50, 100]); // Pattern: delay, vibrate, delay, vibrate
-      isFacingKaabaRef.current = true;
-    } else if (!isFacingKaaba && isFacingKaabaRef.current) {
-      isFacingKaabaRef.current = false;
-    }
-  }, [isFocused, qiblaData, deviceHeading]);
+  useAnimatedReaction(
+    () => isFacingKaaba.value,
+    (facing, previousFacing) => {
+      if (isFocused && facing && !previousFacing) {
+        runOnJS(triggerVibration)();
+      }
+    },
+    [isFocused]
+  );
 
-  // Get the background image based on the upcoming prayer
+  // Get the background image based on the current prayer
   const backgroundImage = displayPrayer
     ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
@@ -121,48 +185,12 @@ export default function Qibla() {
       )}
       {qiblaData && (
         <View className="absolute bottom-24 left-0 right-0 px-6">
-          {(() => {
-            // Calculate relative angle from device heading to Kaaba
-            let relativeAngle = qiblaData.direction - deviceHeading;
-            // Normalize to -180 to 180 range
-            relativeAngle = ((relativeAngle + 180) % 360) - 180;
-
-            // Determine direction guidance
-            let guidance = "";
-            let directionWord = "";
-            if (Math.abs(relativeAngle) < 2.5) {
-              guidance = "Facing the ";
-              directionWord = "Kaaba";
-            } else {
-              // Use sine to determine if Kaaba is on left or right
-              // sin > 0 = icon is on the right (0° to 180°), sin < 0 = icon is on the left (180° to 360°)
-              const radians = (relativeAngle * Math.PI) / 180;
-              if (Math.sin(radians) > 0) {
-                guidance = "Turn to your ";
-                directionWord = "right";
-              } else {
-                guidance = "Turn to your ";
-                directionWord = "left";
-              }
-            }
-
-            return (
-              <View className="flex-row justify-center">
-                <Animated.Text
-                  className=" font-bold text-center text-[40px]"
-                  style={animatedInactiveTextStyle}
-                >
-                  {guidance}
-                </Animated.Text>
-                <Animated.Text
-                  className=" font-bold text-center text-[40px]"
-                  style={animatedActiveTextStyle}
-                >
-                  {directionWord}
-                </Animated.Text>
-              </View>
-            );
-          })()}
+          <GuidanceText
+            qiblaDirection={qiblaData.direction}
+            deviceHeading={deviceHeading}
+            animatedInactiveTextStyle={animatedInactiveTextStyle}
+            animatedActiveTextStyle={animatedActiveTextStyle}
+          />
         </View>
       )}
     </View>

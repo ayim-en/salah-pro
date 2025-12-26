@@ -8,10 +8,11 @@ import {
 } from "@/hooks/useAnimatedColor";
 import React from "react";
 import { View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import type { SharedValue } from "react-native-reanimated";
 
 interface QiblaCompassProps {
-  magnetometer: number;
+  magnetometer: SharedValue<number>;
   qiblaDirection: number;
 }
 
@@ -25,7 +26,7 @@ export const QiblaCompass = ({
   const radius = 140;
   const radians = (qiblaDirection * Math.PI) / 180;
   const translateX = Math.sin(radians) * radius;
-  const translateY = -Math.cos(radians) * radius; // negative because Y increases downward
+  const translateY = -Math.cos(radians) * radius;
 
   // Colors based on dark mode
   const compassBgColor = isDarkMode
@@ -41,15 +42,18 @@ export const QiblaCompass = ({
   const animatedNorthTextStyle = useAnimatedTextColor(colors.active);
   const animatedDirectionTextStyle = useAnimatedTextColor(directionTextColor);
 
+  // Native-driven rotation animation
+  const animatedRotationStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${-magnetometer.value}deg` }],
+    };
+  });
+
   return (
     <View className="w-96 h-96 items-center justify-center">
       <Animated.View
         className="w-full h-full rounded-full border-8 items-center justify-center"
-        style={[
-          { transform: [{ rotate: `${-magnetometer}deg` }] },
-          animatedBorderStyle,
-          animatedBgStyle,
-        ]}
+        style={[animatedRotationStyle, animatedBorderStyle, animatedBgStyle]}
       >
         <View className="absolute top-2">
           <Animated.Text
