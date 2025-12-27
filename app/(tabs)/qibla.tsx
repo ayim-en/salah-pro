@@ -49,14 +49,15 @@ const GuidanceText = ({
   useAnimatedReaction(
     () => {
       let angle = qiblaDirection - deviceHeading.value;
-      angle = ((angle + 180) % 360) - 180;
+      // Normalize to -180 to 180 (handle JS negative modulo correctly)
+      angle = (((angle + 180) % 360) + 360) % 360 - 180;
 
       // Determine guidance key
       if (Math.abs(angle) < 2.5) {
         return "kaaba" as GuidanceKey;
       }
-      const radians = (angle * Math.PI) / 180;
-      return (Math.sin(radians) > 0 ? "right" : "left") as GuidanceKey;
+      // Positive angle means Qibla is clockwise (right), negative means counter-clockwise (left)
+      return (angle > 0 ? "right" : "left") as GuidanceKey;
     },
     (key) => {
       runOnJS(updateGuidanceKey)(key);
@@ -106,7 +107,8 @@ export default function Qibla() {
   const isFacingKaaba = useDerivedValue(() => {
     if (!qiblaData) return false;
     let relativeAngle = qiblaData.direction - deviceHeading.value;
-    relativeAngle = ((relativeAngle + 180) % 360) - 180;
+    // Normalize to -180 to 180 (handle JS negative modulo correctly)
+    relativeAngle = (((relativeAngle + 180) % 360) + 360) % 360 - 180;
     return Math.abs(relativeAngle) < 2.5;
   });
 

@@ -27,9 +27,9 @@ export const CalendarHeader = ({
 
       <View className="absolute left-0 right-0 justify-center items-center pt-20 gap-2">
         <Text
-          className="font-bold text-3xl text-white text-center"
+          className="font-bold text-4xl text-white text-center"
           style={{
-            textShadowColor: "rgba(0,0,0,0.3)",
+            textShadowColor: "rgba(0,0,0,0.4)",
             textShadowOffset: { width: 0, height: 1 },
             textShadowRadius: 2,
           }}
@@ -43,7 +43,7 @@ export const CalendarHeader = ({
         {nextHoliday && hasHoliday && (
           <>
             <Text
-              className="font-bold text-5xl text-white text-center"
+              className="font-bold text-6xl text-white text-center"
               style={{
                 textShadowColor: "rgba(0,0,0,0.4)",
                 textShadowOffset: { width: 0, height: 1 },
@@ -53,9 +53,9 @@ export const CalendarHeader = ({
               {holidayName}
             </Text>
             <Text
-              className="font-bold text-3xl text-white text-center"
+              className="font-bold text-4xl text-white text-center"
               style={{
-                textShadowColor: "rgba(0,0,0,0.3)",
+                textShadowColor: "rgba(0,0,0,0.4)",
                 textShadowOffset: { width: 0, height: 1 },
                 textShadowRadius: 2,
               }}

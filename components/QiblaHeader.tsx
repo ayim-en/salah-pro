@@ -52,11 +52,11 @@ export const QiblaHeader = ({
             {locationName}
           </Text>
           <Text
-            className=" font-bold text-2xl text-white pt-3"
+            className="font-extrabold text-3xl text-white pt-3"
             style={{
-              textShadowColor: "rgba(0,0,0,0.3)",
-              textShadowOffset: { width: 0, height: 1 },
-              textShadowRadius: 2,
+              textShadowColor: "rgba(0,0,0,0.4)",
+              textShadowOffset: { width: 0, height: 2 },
+              textShadowRadius: 4,
             }}
           >
             {currentPrayer
