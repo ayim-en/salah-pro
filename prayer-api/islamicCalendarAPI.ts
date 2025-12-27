@@ -66,6 +66,7 @@ export type CalendarMethod = "HJCoSA" | "UAQ" | "DIYANET" | "MATHEMATICAL";
 
 export interface CalendarOptions {
     calendarMethod?: CalendarMethod;
+    adjustment?: number; // Only used with MATHEMATICAL method
 }
 
 const API_BASE_URL = "https://api.aladhan.com/v1";
@@ -111,7 +112,16 @@ export const fetchHijriCalendar = async (
 ): Promise<CalendarDay[]> => {
     const params = new URLSearchParams();
     if (options?.calendarMethod) {
-        params.append("method", options.calendarMethod);
+        params.append("calendarMethod", options.calendarMethod);
+    }
+    // Adjustment only works with MATHEMATICAL method
+    // Negate the value: user expects +1 = holiday 1 day later, but API works inversely
+    if (
+        options?.adjustment !== undefined &&
+        options.adjustment !== 0 &&
+        options?.calendarMethod === "MATHEMATICAL"
+    ) {
+        params.append("adjustment", (-options.adjustment).toString());
     }
 
     const queryString = params.toString();
@@ -213,6 +223,15 @@ export const fetchNextHijriHoliday = async (
 
     if (options?.calendarMethod) {
         params.append("calendarMethod", options.calendarMethod);
+    }
+    // Adjustment only works with MATHEMATICAL method
+    // Negate the value: user expects +1 = holiday 1 day later, but API works inversely
+    if (
+        options?.adjustment !== undefined &&
+        options.adjustment !== 0 &&
+        options?.calendarMethod === "MATHEMATICAL"
+    ) {
+        params.append("adjustment", (-options.adjustment).toString());
     }
 
     const queryString = params.toString();

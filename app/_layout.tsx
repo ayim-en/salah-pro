@@ -1,3 +1,5 @@
+import { CalendarSettingsProvider } from "@/context/CalendarSettingsContext";
+import { NotificationSettingsProvider } from "@/context/NotificationSettingsContext";
 import { PrayerSettingsProvider } from "@/context/PrayerSettingsContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Stack } from "expo-router";
@@ -26,9 +28,13 @@ Spacings.loadSpacings({
 export default function RootLayout() {
   return (
     <PrayerSettingsProvider>
-      <ThemeProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-      </ThemeProvider>
+      <CalendarSettingsProvider>
+        <NotificationSettingsProvider>
+          <ThemeProvider>
+            <Stack screenOptions={{ headerShown: false }} />
+          </ThemeProvider>
+        </NotificationSettingsProvider>
+      </CalendarSettingsProvider>
     </PrayerSettingsProvider>
   );
 }

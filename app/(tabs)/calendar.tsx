@@ -6,6 +6,7 @@ import {
   lightModeColors,
   prayerBackgrounds,
 } from "@/constants/prayers";
+import { useCalendarSettings } from "@/context/CalendarSettingsContext";
 import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
@@ -42,6 +43,7 @@ export default function CalendarScreen() {
   const [isHolidaySheetOpen, setIsHolidaySheetOpen] = useState(false);
   const [sheetHolidays, setSheetHolidays] = useState<string[]>([]);
   const { colors, themePrayer, isDarkMode } = useThemeColors();
+  const { settings: calendarSettings, loading: calendarSettingsLoading } = useCalendarSettings();
   const bgColor = isDarkMode
     ? darkModeColors.background
     : lightModeColors.background;
@@ -81,11 +83,16 @@ export default function CalendarScreen() {
     : prayerBackgrounds.Fajr;
 
   useEffect(() => {
+    if (calendarSettingsLoading) return;
+
     let isActive = true;
 
     const loadHoliday = async () => {
       try {
-        const data = await fetchNextIncludedHijriHoliday();
+        const data = await fetchNextIncludedHijriHoliday({
+          calendarMethod: calendarSettings.calendarMethod,
+          adjustment: calendarSettings.adjustment,
+        });
         if (isActive) {
           setNextHoliday(data);
         }
@@ -113,7 +120,7 @@ export default function CalendarScreen() {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [calendarSettings, calendarSettingsLoading]);
 
   // Get holiday names for the selected date (if any)
   const selectedHolidays = useMemo(() => {

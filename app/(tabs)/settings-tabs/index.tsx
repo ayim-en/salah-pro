@@ -1,5 +1,6 @@
 import { AnimatedCrossfadeImage } from "@/components/AnimatedCrossfadeImage";
 import { AnimatedTintIcon } from "@/components/AnimatedTintIcon";
+import { CALENDAR_METHODS } from "@/constants/calendarSettings";
 import {
   CALCULATION_METHODS,
   LATITUDE_ADJUSTMENTS,
@@ -14,6 +15,8 @@ import {
   Prayers,
   prayerThemeColors,
 } from "@/constants/prayers";
+import { useCalendarSettings } from "@/context/CalendarSettingsContext";
+import { useNotificationSettings } from "@/context/NotificationSettingsContext";
 import { usePrayerSettings } from "@/context/PrayerSettingsContext";
 import { useThemeColors } from "@/context/ThemeContext";
 import {
@@ -26,6 +29,7 @@ import {
   Pressable,
   ScrollView,
   SectionList,
+  Switch,
   TouchableOpacity,
   UIManager,
   View,
@@ -49,11 +53,13 @@ type SettingsSection = {
   data: SettingsItem[];
 };
 
-type PickerType = "method" | "school" | "latitude" | "tune";
+type PickerType = "method" | "school" | "latitude" | "tune" | "calendarMethod";
 
 export default function SettingsHome() {
   const { colors, isDarkMode, currentPrayer, themePrayer, setThemePrayer } = useThemeColors();
   const { settings, updateSettings, updateTune } = usePrayerSettings();
+  const { settings: calendarSettings, updateSettings: updateCalendarSettings } = useCalendarSettings();
+  const { masterToggle, toggleMasterNotifications } = useNotificationSettings();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set()
   );
@@ -536,9 +542,32 @@ export default function SettingsHome() {
         {
           id: "notifications-content",
           content: (
-            <Animated.Text style={animatedSecondaryTextStyle}>
-              Notification settings coming soon...
-            </Animated.Text>
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1">
+                <Animated.Text
+                  className="text-base font-medium"
+                  style={animatedTextStyle}
+                >
+                  Prayer Notifications
+                </Animated.Text>
+                <Animated.Text
+                  className="text-sm"
+                  style={animatedActiveTextStyle}
+                >
+                  {masterToggle ? "On" : "Off"}
+                </Animated.Text>
+              </View>
+              <Switch
+                value={masterToggle}
+                onValueChange={toggleMasterNotifications}
+                trackColor={{
+                  false: colors.inactive,
+                  true: colors.active,
+                }}
+                thumbColor="#fff"
+                ios_backgroundColor={colors.inactive}
+              />
+            </View>
           ),
         },
       ],
@@ -551,9 +580,157 @@ export default function SettingsHome() {
         {
           id: "calendar-content",
           content: (
-            <Animated.Text style={animatedSecondaryTextStyle}>
-              Calendar settings coming soon...
-            </Animated.Text>
+            <View className="gap-2">
+              {/* Calendar Method Dropdown */}
+              <View>
+                <TouchableOpacity
+                  onPress={() => togglePicker("calendarMethod")}
+                  className="flex-row items-center py-2"
+                >
+                  <View className="flex-1">
+                    <Animated.Text
+                      className="text-base font-medium"
+                      style={animatedTextStyle}
+                    >
+                      Calculation Method
+                    </Animated.Text>
+                    <Animated.Text
+                      className="text-sm"
+                      style={animatedActiveTextStyle}
+                    >
+                      {CALENDAR_METHODS.find((m) => m.id === calendarSettings.calendarMethod)
+                        ?.name || "Select Method"}
+                    </Animated.Text>
+                  </View>
+                  <Animated.View
+                    style={{
+                      transform: [
+                        {
+                          rotate: expandedPickers.has("calendarMethod")
+                            ? "180deg"
+                            : "0deg",
+                        },
+                      ],
+                    }}
+                  >
+                    <AnimatedTintIcon
+                      source={require("../../../assets/images/prayer-pro-icons/settings-tab/settings-dropdown.png")}
+                      size={16}
+                      tintColor={colors.active}
+                    />
+                  </Animated.View>
+                </TouchableOpacity>
+                {expandedPickers.has("calendarMethod") && (
+                  <View className="mt-1">
+                    {CALENDAR_METHODS.map((method) => {
+                      const isSelected = calendarSettings.calendarMethod === method.id;
+                      return (
+                        <TouchableOpacity
+                          key={method.id}
+                          onPress={() => {
+                            updateCalendarSettings({ calendarMethod: method.id });
+                            togglePicker("calendarMethod");
+                          }}
+                          className="flex-row items-center py-2 pl-4"
+                        >
+                          <View className="flex-1">
+                            <Animated.Text
+                              style={isSelected ? animatedActiveTextStyle : animatedSecondaryTextStyle}
+                            >
+                              {method.name}
+                            </Animated.Text>
+                            <Animated.Text
+                              className="text-xs"
+                              style={animatedSecondaryTextStyle}
+                            >
+                              {method.description}
+                            </Animated.Text>
+                          </View>
+                          {isSelected && (
+                            <Animated.Text style={animatedActiveTextStyle}>
+                              ✓
+                            </Animated.Text>
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Day Adjustment (only for MATHEMATICAL method) */}
+              {calendarSettings.calendarMethod === "MATHEMATICAL" && (
+                <>
+                  <Animated.View className="my-2" style={[{ height: 1 }, animatedSeparatorStyle]} />
+                  <View className="flex-row items-center justify-between py-2">
+                    <View className="flex-1">
+                      <Animated.Text
+                        className="text-base font-medium"
+                        style={animatedTextStyle}
+                      >
+                        Day Adjustment
+                      </Animated.Text>
+                      <Animated.Text
+                        className="text-sm"
+                        style={animatedActiveTextStyle}
+                      >
+                        {calendarSettings.adjustment > 0
+                          ? `+${calendarSettings.adjustment} days`
+                          : calendarSettings.adjustment < 0
+                          ? `${calendarSettings.adjustment} days`
+                          : "No adjustment"}
+                      </Animated.Text>
+                    </View>
+                    <View className="flex-row items-center">
+                      <TouchableOpacity
+                        onPress={() =>
+                          updateCalendarSettings({
+                            adjustment: Math.max(-3, calendarSettings.adjustment - 1),
+                          })
+                        }
+                        className="w-8 h-8 rounded-full items-center justify-center"
+                        style={{ backgroundColor: colors.active + "20" }}
+                      >
+                        <Animated.Text
+                          className="text-lg font-bold"
+                          style={animatedActiveTextStyle}
+                        >
+                          −
+                        </Animated.Text>
+                      </TouchableOpacity>
+                      <Animated.Text
+                        className="w-10 text-center font-medium"
+                        style={
+                          calendarSettings.adjustment !== 0
+                            ? animatedActiveTextStyle
+                            : animatedSecondaryTextStyle
+                        }
+                      >
+                        {calendarSettings.adjustment > 0
+                          ? `+${calendarSettings.adjustment}`
+                          : calendarSettings.adjustment}
+                      </Animated.Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          updateCalendarSettings({
+                            adjustment: Math.min(3, calendarSettings.adjustment + 1),
+                          })
+                        }
+                        className="w-8 h-8 rounded-full items-center justify-center"
+                        style={{ backgroundColor: colors.active + "20" }}
+                      >
+                        <Animated.Text
+                          className="text-lg font-bold"
+                          style={animatedActiveTextStyle}
+                        >
+                          +
+                        </Animated.Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </>
+              )}
+            </View>
           ),
         },
       ],

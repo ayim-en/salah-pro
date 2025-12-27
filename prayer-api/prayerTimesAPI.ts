@@ -53,7 +53,7 @@ const gregorianDateToISO = (gregorianDate: string) => {
 export const transformPrayerDict = (dataArray: DayItem[]): PrayerDict => 
     dataArray.reduce<PrayerDict>((acc, item) => {
         const key = gregorianDateToISO(item.date.gregorian.date);
-        const { Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha } = item.timings; // Could add Sunrise here
+        const { Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha } = item.timings;
 
         acc[key] = {
             timings: { Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha },
