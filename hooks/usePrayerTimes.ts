@@ -1,4 +1,6 @@
 import { Prayers } from "@/constants/prayers";
+import { tuneSettingsToString } from "@/constants/prayerSettings";
+import { usePrayerSettings } from "@/context/PrayerSettingsContext";
 import { getPrayerDict, PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { getLocalISODate } from "@/utils/calendarHelpers";
 import { getCurrentPrayer } from "@/utils/prayerHelpers";
@@ -7,15 +9,17 @@ import * as Location from "expo-location";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const usePrayerTimes = (location: Location.LocationObject | null) => {
+  const { settings, loading: settingsLoading } = usePrayerSettings();
   const [prayerDict, setPrayerDict] = useState<PrayerDict>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // Fetches prayer times when location changes
+
+  // Fetches prayer times when location or settings change
   useEffect(() => {
-    if (!location) return;
+    if (!location || settingsLoading) return;
 
     (async () => {
+      setLoading(true);
       try {
         // based off Prayer times for a Gregorian month API
         const baseUrl = "https://api.aladhan.com/v1/";
@@ -26,8 +30,10 @@ export const usePrayerTimes = (location: Location.LocationObject | null) => {
         const data = await getPrayerDict(baseUrl, year, month, {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
-          method: 2,
-          school: 0,
+          method: settings.method,
+          school: settings.school,
+          latitudeAdjustmentMethod: settings.latitudeAdjustmentMethod,
+          tune: tuneSettingsToString(settings.tune),
         });
         setPrayerDict(data);
       } catch (err: any) {
@@ -38,7 +44,7 @@ export const usePrayerTimes = (location: Location.LocationObject | null) => {
         setLoading(false);
       }
     })();
-  }, [location]);
+  }, [location, settings, settingsLoading]);
 
   // Sorts prayerDict dates in numerical order which is chronological for ISO strings
   const sortedDates = useMemo(

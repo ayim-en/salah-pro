@@ -1,3 +1,4 @@
+import { PrayerSettingsProvider } from "@/context/PrayerSettingsContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Stack } from "expo-router";
 import React from "react";
@@ -24,8 +25,10 @@ Spacings.loadSpacings({
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <Stack screenOptions={{ headerShown: false }} />
-    </ThemeProvider>
+    <PrayerSettingsProvider>
+      <ThemeProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+      </ThemeProvider>
+    </PrayerSettingsProvider>
   );
 }

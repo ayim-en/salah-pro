@@ -69,9 +69,10 @@ export type PrayerTimesParams = {
     latitude: number;
     longitude: number;
 
-    method?: number; 
+    method?: number;
     tune?: string;
     school?: 0 | 1; // 0 for Shafi, 1 for Hanafi
+    latitudeAdjustmentMethod?: number | null; // 1: Middle of Night, 2: One Seventh, 3: Angle Based
 };
 
 export const getPrayerDict = async (
@@ -96,6 +97,9 @@ export const getPrayerDict = async (
         }
         if (params.school !== undefined) {
             queryParams.append('school', params.school.toString());
+        }
+        if (params.latitudeAdjustmentMethod !== undefined && params.latitudeAdjustmentMethod !== null) {
+            queryParams.append('latitudeAdjustmentMethod', params.latitudeAdjustmentMethod.toString());
         }
 
         url.search = queryParams.toString();
