@@ -87,7 +87,7 @@ const GuidanceText = ({
 };
 
 export default function Qibla() {
-  const { location, locationName, error: locationError } = useLocation();
+  const { location, cityName, error: locationError, refreshLocation } = useLocation();
   const { qiblaData, loading, error: qiblaError } = useQiblaDirection(location);
   const { currentPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
@@ -132,7 +132,8 @@ export default function Qibla() {
     ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
     : prayerBackgrounds.Fajr;
 
-  if (loading) {
+  // Only show loading screen on initial load, not when refreshing
+  if (loading && !qiblaData) {
     return (
       <View
         className="flex-1 items-center justify-center"
@@ -167,9 +168,10 @@ export default function Qibla() {
       <StatusBar style="light" />
       <QiblaHeader
         qiblaDirection={qiblaData?.direction ?? null}
-        locationName={locationName}
+        locationName={cityName}
         backgroundImage={backgroundImage}
         currentPrayer={currentPrayer}
+        onRefreshLocation={refreshLocation}
       />
 
       {qiblaData && (

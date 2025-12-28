@@ -1,5 +1,4 @@
 import { NextHijriHolidayData } from "@/prayer-api/islamicCalendarAPI";
-import { formatHijriDate } from "@/utils/prayerHelpers";
 import React from "react";
 import { Text, View } from "react-native";
 import { AnimatedCrossfadeImage } from "./AnimatedCrossfadeImage";
@@ -25,9 +24,9 @@ export const CalendarHeader = ({
     <>
       <AnimatedCrossfadeImage source={backgroundImage} resizeMode="cover" />
 
-      <View className="absolute left-0 right-0 justify-center items-center pt-20 gap-2">
+      <View className="absolute left-0 right-0 justify-center items-center pt-24 gap-2">
         <Text
-          className="font-bold text-4xl text-white text-center"
+          className="font-bold text-5xl text-white text-center"
           style={{
             textShadowColor: "rgba(0,0,0,0.4)",
             textShadowOffset: { width: 0, height: 1 },
@@ -41,28 +40,16 @@ export const CalendarHeader = ({
             : "Loading upcoming holiday..."}
         </Text>
         {nextHoliday && hasHoliday && (
-          <>
-            <Text
-              className="font-bold text-6xl text-white text-center"
-              style={{
-                textShadowColor: "rgba(0,0,0,0.4)",
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 3,
-              }}
-            >
-              {holidayName}
-            </Text>
-            <Text
-              className="font-bold text-4xl text-white text-center"
-              style={{
-                textShadowColor: "rgba(0,0,0,0.4)",
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 2,
-              }}
-            >
-              {formatHijriDate(nextHoliday.gregorian.date)}
-            </Text>
-          </>
+          <Text
+            className="font-bold text-5xl text-white text-center"
+            style={{
+              textShadowColor: "rgba(0,0,0,0.4)",
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 3,
+            }}
+          >
+            {holidayName}
+          </Text>
         )}
       </View>
     </>

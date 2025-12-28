@@ -1,10 +1,14 @@
 import { darkModeColors, lightModeColors } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
-import { useAnimatedBackgroundColor } from "@/hooks/useAnimatedColor";
+import {
+  useAnimatedBackgroundColor,
+  useAnimatedTextColor,
+} from "@/hooks/useAnimatedColor";
 import React from "react";
-import { Dimensions, Text, View } from "react-native";
+import { Dimensions, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { AnimatedCrossfadeImage } from "./AnimatedCrossfadeImage";
+import { AnimatedTintIcon } from "./AnimatedTintIcon";
 
 const { height } = Dimensions.get("window");
 
@@ -13,6 +17,7 @@ interface QiblaHeaderProps {
   locationName: string;
   backgroundImage: any;
   currentPrayer?: { prayer: string } | null;
+  onRefreshLocation?: () => void;
 }
 
 export const QiblaHeader = ({
@@ -20,12 +25,16 @@ export const QiblaHeader = ({
   locationName,
   backgroundImage,
   currentPrayer,
+  onRefreshLocation,
 }: QiblaHeaderProps) => {
-  const { isDarkMode } = useThemeColors();
+  const { isDarkMode, colors } = useThemeColors();
+
   const bgColor = isDarkMode
     ? darkModeColors.background
     : lightModeColors.background;
   const animatedBgStyle = useAnimatedBackgroundColor(bgColor);
+  const animatedPillBgStyle = useAnimatedBackgroundColor(bgColor);
+  const animatedTextStyle = useAnimatedTextColor(colors.active);
 
   return (
     <>
@@ -37,35 +46,39 @@ export const QiblaHeader = ({
         style={[{ height: height * 0.455 }, animatedBgStyle]}
       />
       {/* Location display */}
-      <View className="absolute left-0 right-0 items-center pt-24">
-        <View className="items-center w-[90%]">
-          <Text
-            className="font-extrabold text-white text-[48px] text-center"
-            adjustsFontSizeToFit
-            numberOfLines={1}
-            style={{
-              textShadowColor: "rgba(0,0,0,0.4)",
-              textShadowOffset: { width: 0, height: 2 },
-              textShadowRadius: 4,
-            }}
+      <View className="absolute top-16 left-6">
+        <Animated.View
+          className="flex-row items-center gap-2 rounded-full px-4 py-2"
+          style={animatedPillBgStyle}
+        >
+          <AnimatedTintIcon
+            source={require("../assets/images/prayer-pro-icons/home-page/icon-location.png")}
+            size={18}
+            tintColor={colors.active}
+          />
+          <Animated.Text
+            className="font-bold text-2xl"
+            style={animatedTextStyle}
           >
             {locationName}
-          </Text>
-          <Text
-            className="font-extrabold text-3xl text-white pt-3"
-            style={{
-              textShadowColor: "rgba(0,0,0,0.4)",
-              textShadowOffset: { width: 0, height: 2 },
-              textShadowRadius: 4,
-            }}
+          </Animated.Text>
+        </Animated.View>
+      </View>
+
+      {/* Refresh location button */}
+      <View className="absolute top-16 right-6">
+        <TouchableOpacity onPress={onRefreshLocation} activeOpacity={0.7}>
+          <Animated.View
+            className="rounded-full p-3"
+            style={animatedPillBgStyle}
           >
-            {currentPrayer
-              ? currentPrayer.prayer === "Sunrise"
-                ? "Current: Sunrise"
-                : `Current Prayer: ${currentPrayer.prayer}`
-              : "Loading current prayer..."}
-          </Text>
-        </View>
+            <AnimatedTintIcon
+              source={require("../assets/images/prayer-pro-icons/qibla-tab/qibla-refresh.png")}
+              size={22}
+              tintColor={colors.active}
+            />
+          </Animated.View>
+        </TouchableOpacity>
       </View>
     </>
   );
