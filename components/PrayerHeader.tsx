@@ -22,11 +22,11 @@ export const PrayerHeader = ({
   locationName,
 }: CurrentPrayerHeaderProps) => {
   const { isDarkMode, themePrayer } = useThemeColors();
-  // Get the background image based on theme prayer (if set) or current prayer
+  // Get the background image based on theme prayer (if set) or current prayer (null if not loaded yet)
   const displayPrayer = themePrayer || currentPrayer?.prayer;
   const backgroundImage = displayPrayer
-    ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
-    : prayerBackgrounds.Fajr;
+    ? prayerBackgrounds[displayPrayer] || null
+    : null;
 
   const bgColor = isDarkMode
     ? darkModeColors.background

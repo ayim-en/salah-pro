@@ -11,14 +11,11 @@ export const useLocation = () => {
   const [cityName, setCityName] = useState<string>("Loading...");
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLocation = useCallback(async (isRefresh = false) => {
+  const fetchLocation = useCallback(async () => {
     try {
       setError(null);
-      // Only show loading text on initial load, not on refresh
-      if (!isRefresh) {
-        setCityName("Loading...");
-        setLocationName("Loading location...");
-      }
+      setCityName("Loading...");
+      setLocationName("Loading location...");
 
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -65,7 +62,7 @@ export const useLocation = () => {
     })();
   }, [location]);
 
-  const refreshLocation = useCallback(() => fetchLocation(true), [fetchLocation]);
+  const refreshLocation = useCallback(() => fetchLocation(), [fetchLocation]);
 
   return { location, locationName, cityName, error, refreshLocation };
 };

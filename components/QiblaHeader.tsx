@@ -15,7 +15,7 @@ const { height } = Dimensions.get("window");
 interface QiblaHeaderProps {
   qiblaDirection: number | null;
   locationName: string;
-  backgroundImage: any;
+  backgroundImage: any | null;
   currentPrayer?: { prayer: string } | null;
   onRefreshLocation?: () => void;
 }

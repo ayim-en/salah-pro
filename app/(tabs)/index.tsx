@@ -1,7 +1,7 @@
 import type { PrayerCarouselRef } from "@/components/PrayerCarousel";
 import { PrayerCarousel } from "@/components/PrayerCarousel";
 import { PrayerHeader } from "@/components/PrayerHeader";
-import { prayerThemeColors } from "@/constants/prayers";
+import { darkModeColors, lightModeColors, prayerThemeColors } from "@/constants/prayers";
 import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -9,7 +9,7 @@ import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, useColorScheme, View } from "react-native";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -17,6 +17,8 @@ export default function Index() {
   const carouselRef = useRef<PrayerCarouselRef>(null);
   const navigation = useNavigation<any>();
   const { themePrayer, isDarkMode } = useThemeColors();
+  const colorScheme = useColorScheme();
+  const systemIsDark = colorScheme === "dark";
 
   // Custom hooks to get states
   const { location, locationName, error: locationError } = useLocation();
@@ -61,11 +63,17 @@ export default function Index() {
   // Theme uses override if set, otherwise actual current prayer
   const themePrayerDisplay = themePrayer || currentPrayer?.prayer;
 
-  if (loading) return <ActivityIndicator className="mt-12" />;
-  if (error) return <Text className="color-red-600 m-4">{error}</Text>;
+  // Use system color scheme for background to match root layout during initial load
+  const bgColor = (isDarkMode || systemIsDark) ? darkModeColors.background : lightModeColors.background;
+
+  if (error) return (
+    <View className="flex-1 m-4" style={{ backgroundColor: bgColor }}>
+      <Text className="color-red-600">{error}</Text>
+    </View>
+  );
 
   return (
-    <View className="flex-1">
+    <View className="flex-1" style={{ backgroundColor: bgColor }}>
       <StatusBar style="light" />
       <PrayerHeader
         currentPrayer={currentPrayer}
@@ -94,7 +102,7 @@ export default function Index() {
             : "#8398a3"
         }
         currentPrayer={currentPrayer?.prayer || null}
-        isDarkMode={isDarkMode}
+        isDarkMode={isDarkMode || systemIsDark}
       />
     </View>
   );

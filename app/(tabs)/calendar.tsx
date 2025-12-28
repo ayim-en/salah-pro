@@ -76,11 +76,11 @@ export default function CalendarScreen() {
     return unsubscribe;
   }, [navigation, scrollToToday]);
 
-  // Use theme prayer if set, otherwise use actual current prayer for background
+  // Use theme prayer if set, otherwise use actual current prayer for background (null if not loaded yet)
   const displayPrayer = themePrayer || currentPrayer?.prayer;
   const backgroundImage = displayPrayer
-    ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
-    : prayerBackgrounds.Fajr;
+    ? prayerBackgrounds[displayPrayer] || null
+    : null;
 
   useEffect(() => {
     if (calendarSettingsLoading) return;
@@ -160,7 +160,7 @@ export default function CalendarScreen() {
   }, [selectedHolidays, holidayBadgeAnim]);
 
   return (
-    <View className="flex-1">
+    <View className="flex-1" style={{ backgroundColor: bgColor }}>
       <CalendarHeader
         locationName={locationName}
         backgroundImage={backgroundImage}

@@ -3,9 +3,14 @@ import { NotificationSettingsProvider } from "@/context/NotificationSettingsCont
 import { PrayerSettingsProvider } from "@/context/PrayerSettingsContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Stack } from "expo-router";
-import React from "react";
+import * as SplashScreen from "expo-splash-screen";
+import React, { useEffect } from "react";
+import { useColorScheme, View } from "react-native";
 import { Colors, Spacings, Typography } from "react-native-ui-lib";
 import "./global.css";
+
+// Keep splash screen visible briefly
+SplashScreen.preventAutoHideAsync();
 
 Colors.loadColors({
   primary: "#3B82F6",
@@ -26,15 +31,31 @@ Spacings.loadSpacings({
 });
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
+
   return (
-    <PrayerSettingsProvider>
-      <CalendarSettingsProvider>
-        <NotificationSettingsProvider>
-          <ThemeProvider>
-            <Stack screenOptions={{ headerShown: false }} />
-          </ThemeProvider>
-        </NotificationSettingsProvider>
-      </CalendarSettingsProvider>
-    </PrayerSettingsProvider>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#1a1a2e" : "#ffffff" }}>
+      <PrayerSettingsProvider>
+        <CalendarSettingsProvider>
+          <NotificationSettingsProvider>
+            <ThemeProvider>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: {
+                    backgroundColor: isDark ? "#1a1a2e" : "#ffffff",
+                  },
+                }}
+              />
+            </ThemeProvider>
+          </NotificationSettingsProvider>
+        </CalendarSettingsProvider>
+      </PrayerSettingsProvider>
+    </View>
   );
 }

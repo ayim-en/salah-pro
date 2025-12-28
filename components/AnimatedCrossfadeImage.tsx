@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, ViewStyle } from "react-native";
 
 interface AnimatedCrossfadeImageProps {
-  source: ImageSource;
+  source: ImageSource | null;
   duration?: number;
   style?: ViewStyle;
   resizeMode?: "cover" | "contain" | "stretch";
@@ -19,6 +19,8 @@ export const AnimatedCrossfadeImage: React.FC<AnimatedCrossfadeImageProps> = ({
   style,
   resizeMode = "cover",
 }) => {
+  if (!source) return null;
+
   return (
     <Image
       source={source}

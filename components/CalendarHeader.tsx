@@ -6,7 +6,7 @@ import { AnimatedCrossfadeImage } from "./AnimatedCrossfadeImage";
 interface CalendarHeaderProps {
   currentPrayer: { prayer: string; time: string } | null;
   locationName: string;
-  backgroundImage: any;
+  backgroundImage: any | null;
   nextHoliday: NextHijriHolidayData | null;
 }
 

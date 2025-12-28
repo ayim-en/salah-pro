@@ -79,11 +79,11 @@ export default function SettingsHome() {
     ? darkModeColors.background
     : lightModeColors.background;
 
-  // Get the background image based on theme prayer or current prayer
+  // Get the background image based on theme prayer or current prayer (null if not loaded yet)
   const displayPrayer = themePrayer || currentPrayer;
   const backgroundImage = displayPrayer
-    ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
-    : prayerBackgrounds.Fajr;
+    ? prayerBackgrounds[displayPrayer] || null
+    : null;
   const textColor = isDarkMode ? darkModeColors.text : lightModeColors.text;
   const secondaryTextColor = isDarkMode
     ? darkModeColors.textSecondary
@@ -317,7 +317,7 @@ export default function SettingsHome() {
   );
 
   return (
-    <View className="flex-1">
+    <View className="flex-1" style={{ backgroundColor: bgColor }}>
       <AnimatedCrossfadeImage source={backgroundImage} resizeMode="cover" />
       <View className="pt-32 pb-4 items-center">
         <Animated.Text

@@ -14,7 +14,7 @@ import { useQiblaDirection } from "@/hooks/useQiblaDirection";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { ActivityIndicator, Text, Vibration, View } from "react-native";
+import { Text, Vibration, View } from "react-native";
 import Animated, {
   runOnJS,
   SharedValue,
@@ -92,6 +92,7 @@ export default function Qibla() {
   const { currentPrayer } = usePrayerTimes(location);
   const deviceHeading = useDeviceHeading();
   const { colors, themePrayer, isDarkMode } = useThemeColors();
+  const bgColor = isDarkMode ? darkModeColors.background : lightModeColors.background;
   const isFocused = useIsFocused();
 
   // Animated text styles for guidance
@@ -127,26 +128,10 @@ export default function Qibla() {
     [isFocused]
   );
 
-  // Get the background image based on the current prayer
+  // Get the background image based on the current prayer (null if not loaded yet)
   const backgroundImage = displayPrayer
-    ? prayerBackgrounds[displayPrayer] || prayerBackgrounds.Fajr
-    : prayerBackgrounds.Fajr;
-
-  // Only show loading screen on initial load, not when refreshing
-  if (loading && !qiblaData) {
-    return (
-      <View
-        className="flex-1 items-center justify-center"
-        style={{
-          backgroundColor: isDarkMode
-            ? darkModeColors.background
-            : lightModeColors.background,
-        }}
-      >
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+    ? prayerBackgrounds[displayPrayer] || null
+    : null;
 
   if (error) {
     return (
@@ -164,7 +149,7 @@ export default function Qibla() {
   }
 
   return (
-    <View className="flex-1">
+    <View className="flex-1" style={{ backgroundColor: bgColor }}>
       <StatusBar style="light" />
       <QiblaHeader
         qiblaDirection={qiblaData?.direction ?? null}

@@ -12,7 +12,7 @@ import { Carousel } from "react-native-ui-lib";
 import { AnimatedTintIcon } from "./AnimatedTintIcon";
 
 const { width, height } = Dimensions.get("window");
-const pageHeight = height * 0.45;
+const pageHeight = height * 0.50;
 const pageWidth = width * 0.85;
 const itemSpacing = 10;
 
@@ -77,16 +77,24 @@ export const PrayerCarousel = forwardRef<
       : lightModeColors.textTertiary;
 
     return (
-      <View className="pt-64 items-center mt-40 mb-12">
+      <View
+        className="flex-1 pt-8 pb-2 items-center mt-[22rem] rounded-t-3xl"
+        style={{ backgroundColor: bgColor }}
+      >
         <View
           className="relative"
-          style={{ width: pageWidth + itemSpacing, height: pageHeight }}
+          style={{
+            width: pageWidth + itemSpacing,
+            height: pageHeight,
+            backgroundColor: bgColor,
+          }}
         >
           <Carousel
             ref={carouselRef}
             containerStyle={{
               height: pageHeight,
               width: pageWidth + itemSpacing,
+              backgroundColor: bgColor,
             }}
             pageWidth={pageWidth}
             onChangePage={onPageChange}
@@ -102,10 +110,10 @@ export const PrayerCarousel = forwardRef<
                   key={isoDate}
                   className="w-full h-full rounded-xl justify-start"
                 >
-                  <View className="mb-4">
+                  <View className="mb-2">
                     <Text
                       style={{
-                        fontSize: 20,
+                        fontSize: 24,
                         fontWeight: "bold",
                         color: textColor,
                       }}
@@ -114,7 +122,7 @@ export const PrayerCarousel = forwardRef<
                     </Text>
                     {isToday && (
                       <Text
-                        className="text-xs font-semibold mt-1"
+                        className="text-sm font-semibold mt-1"
                         style={{ color: activeColor }}
                       >
                         TODAY
@@ -126,19 +134,21 @@ export const PrayerCarousel = forwardRef<
                     {Prayers.map((prayer) => (
                       <View
                         key={prayer}
-                        className="flex-row justify-between items-center py-2"
+                        className="flex-row justify-between items-center py-5"
                       >
                         <View className="flex-row items-center gap-4">
                           <AnimatedTintIcon
                             source={prayerIcons[prayer]}
                             size={24}
                             tintColor={
-                              prayer === currentPrayer ? activeColor : inactiveColor
+                              prayer === currentPrayer
+                                ? activeColor
+                                : inactiveColor
                             }
                           />
                           <Text
                             style={{
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: "600",
                               color: secondaryTextColor,
                             }}
@@ -148,7 +158,7 @@ export const PrayerCarousel = forwardRef<
                         </View>
                         <View className="flex-row items-center gap-4">
                           <Text
-                            style={{ fontSize: 16, color: tertiaryTextColor }}
+                            style={{ fontSize: 18, color: tertiaryTextColor }}
                           >
                             {cleanTimeString(dayPrayers.timings[prayer])}
                           </Text>
@@ -166,7 +176,9 @@ export const PrayerCarousel = forwardRef<
                               }
                               size={24}
                               tintColor={
-                                prayer === currentPrayer ? activeColor : inactiveColor
+                                prayer === currentPrayer
+                                  ? activeColor
+                                  : inactiveColor
                               }
                             />
                           </Pressable>
