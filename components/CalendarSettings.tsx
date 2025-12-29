@@ -1,6 +1,6 @@
 import { AnimatedTintIcon } from "@/components/AnimatedTintIcon";
 import { CALENDAR_METHODS, CalendarSettings as CalendarSettingsType } from "@/constants/calendarSettings";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -27,6 +27,28 @@ export const CalendarSettingsComponent = ({
   animatedSecondaryTextStyle,
   animatedSeparatorStyle,
 }: CalendarSettingsProps) => {
+  // Local state for day adjustment (allows spamming buttons without saving)
+  const [localAdjustment, setLocalAdjustment] = useState(settings.adjustment);
+  const isMathematical = settings.calendarMethod === "MATHEMATICAL";
+
+  // Check if local adjustment differs from saved settings
+  const hasUnsavedChanges = localAdjustment !== settings.adjustment;
+
+  // Sync local adjustment when settings change externally or method changes
+  useEffect(() => {
+    setLocalAdjustment(settings.adjustment);
+  }, [settings.adjustment, settings.calendarMethod]);
+
+  // Save adjustment changes
+  const saveChanges = useCallback(async () => {
+    await updateSettings({ adjustment: localAdjustment });
+  }, [localAdjustment, updateSettings]);
+
+  // Discard changes
+  const discardChanges = useCallback(() => {
+    setLocalAdjustment(settings.adjustment);
+  }, [settings.adjustment]);
+
   return (
     <View className="gap-2">
       {/* Calendar Method Dropdown */}
@@ -181,7 +203,7 @@ export const CalendarSettingsComponent = ({
       </View>
 
       {/* Day Adjustment (only for MATHEMATICAL method) */}
-      {settings.calendarMethod === "MATHEMATICAL" && (
+      {isMathematical && (
         <>
           <Animated.View className="my-2" style={[{ height: 1 }, animatedSeparatorStyle]} />
           <View className="flex-row items-center justify-between py-2">
@@ -196,19 +218,17 @@ export const CalendarSettingsComponent = ({
                 className="text-sm"
                 style={animatedActiveTextStyle}
               >
-                {settings.adjustment > 0
-                  ? `+${settings.adjustment} days`
-                  : settings.adjustment < 0
-                  ? `${settings.adjustment} days`
+                {localAdjustment > 0
+                  ? `+${localAdjustment} days`
+                  : localAdjustment < 0
+                  ? `${localAdjustment} days`
                   : "No adjustment"}
               </Animated.Text>
             </View>
             <View className="flex-row items-center">
               <TouchableOpacity
                 onPress={() =>
-                  updateSettings({
-                    adjustment: Math.max(-3, settings.adjustment - 1),
-                  })
+                  setLocalAdjustment((prev) => Math.max(-3, prev - 1))
                 }
                 className="w-8 h-8 rounded-full items-center justify-center"
                 style={{ backgroundColor: colors.active + "20" }}
@@ -223,20 +243,18 @@ export const CalendarSettingsComponent = ({
               <Animated.Text
                 className="w-10 text-center font-medium"
                 style={
-                  settings.adjustment !== 0
+                  localAdjustment !== 0
                     ? animatedActiveTextStyle
                     : animatedSecondaryTextStyle
                 }
               >
-                {settings.adjustment > 0
-                  ? `+${settings.adjustment}`
-                  : settings.adjustment}
+                {localAdjustment > 0
+                  ? `+${localAdjustment}`
+                  : localAdjustment}
               </Animated.Text>
               <TouchableOpacity
                 onPress={() =>
-                  updateSettings({
-                    adjustment: Math.min(3, settings.adjustment + 1),
-                  })
+                  setLocalAdjustment((prev) => Math.min(3, prev + 1))
                 }
                 className="w-8 h-8 rounded-full items-center justify-center"
                 style={{ backgroundColor: colors.active + "20" }}
@@ -250,6 +268,32 @@ export const CalendarSettingsComponent = ({
               </TouchableOpacity>
             </View>
           </View>
+          {/* Save/Discard buttons */}
+          {hasUnsavedChanges && (
+            <View className="flex-row justify-end gap-3 mt-2">
+              <TouchableOpacity
+                onPress={discardChanges}
+                className="px-4 py-2 rounded-lg"
+                style={{ backgroundColor: colors.active + "20" }}
+              >
+                <Animated.Text
+                  className="font-medium"
+                  style={animatedSecondaryTextStyle}
+                >
+                  Discard
+                </Animated.Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={saveChanges}
+                className="px-4 py-2 rounded-lg"
+                style={{ backgroundColor: colors.active }}
+              >
+                <Animated.Text className="font-medium text-white">
+                  Save Changes
+                </Animated.Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </>
       )}
     </View>

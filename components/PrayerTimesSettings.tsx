@@ -6,15 +6,16 @@ import {
   SCHOOLS,
   TUNABLE_PRAYERS,
   TunablePrayer,
+  TuneSettings,
 } from "@/constants/prayerSettings";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 interface PrayerTimesSettingsProps {
   settings: PrayerSettings;
   updateSettings: (newSettings: Partial<PrayerSettings>) => Promise<void>;
-  updateTune: (prayer: TunablePrayer, value: number) => Promise<void>;
+  updateAllTune: (tune: TuneSettings) => Promise<void>;
   expandedPickers: Set<string>;
   togglePicker: (picker: string) => void;
   colors: { active: string; inactive: string };
@@ -27,7 +28,7 @@ interface PrayerTimesSettingsProps {
 export const PrayerTimesSettings = ({
   settings,
   updateSettings,
-  updateTune,
+  updateAllTune,
   expandedPickers,
   togglePicker,
   colors,
@@ -36,6 +37,38 @@ export const PrayerTimesSettings = ({
   animatedSecondaryTextStyle,
   animatedSeparatorStyle,
 }: PrayerTimesSettingsProps) => {
+  // Local state for tune adjustments (allows spamming buttons without saving)
+  const [localTune, setLocalTune] = useState<TuneSettings>(settings.tune);
+  const isTuneExpanded = expandedPickers.has("tune");
+
+  // Check if local tune differs from saved settings
+  const hasUnsavedChanges = TUNABLE_PRAYERS.some(
+    (p) => localTune[p.key] !== settings.tune[p.key]
+  );
+
+  // Reset local tune when picker is opened (sync with current saved values)
+  useEffect(() => {
+    if (isTuneExpanded) {
+      setLocalTune(settings.tune);
+    }
+  }, [isTuneExpanded, settings.tune]);
+
+  // Update local tune value (doesn't save to storage)
+  const updateLocalTune = useCallback((prayer: TunablePrayer, value: number) => {
+    setLocalTune((prev) => ({ ...prev, [prayer]: value }));
+  }, []);
+
+  // Save all tune changes at once
+  const saveChanges = useCallback(async () => {
+    await updateAllTune(localTune);
+  }, [localTune, updateAllTune]);
+
+  // Discard changes and close picker
+  const discardChanges = useCallback(() => {
+    setLocalTune(settings.tune);
+    togglePicker("tune");
+  }, [settings.tune, togglePicker]);
+
   return (
     <View className="gap-2">
       {/* Calculation Method Dropdown */}
@@ -319,7 +352,7 @@ export const PrayerTimesSettings = ({
         {expandedPickers.has("tune") && (
           <View className="mt-1">
             {TUNABLE_PRAYERS.map((prayer) => {
-              const tuneValue = settings.tune[prayer.key];
+              const tuneValue = localTune[prayer.key];
               const hasAdjustment = tuneValue !== 0;
               return (
                 <View
@@ -334,7 +367,7 @@ export const PrayerTimesSettings = ({
                   <View className="flex-row items-center">
                     <TouchableOpacity
                       onPress={() =>
-                        updateTune(prayer.key as TunablePrayer, tuneValue - 1)
+                        updateLocalTune(prayer.key as TunablePrayer, tuneValue - 1)
                       }
                       className="w-7 h-7 rounded-full items-center justify-center"
                       style={{ backgroundColor: colors.active + "20" }}
@@ -354,7 +387,7 @@ export const PrayerTimesSettings = ({
                     </Animated.Text>
                     <TouchableOpacity
                       onPress={() =>
-                        updateTune(prayer.key as TunablePrayer, tuneValue + 1)
+                        updateLocalTune(prayer.key as TunablePrayer, tuneValue + 1)
                       }
                       className="w-7 h-7 rounded-full items-center justify-center"
                       style={{ backgroundColor: colors.active + "20" }}
@@ -370,6 +403,32 @@ export const PrayerTimesSettings = ({
                 </View>
               );
             })}
+            {/* Save/Discard buttons */}
+            {hasUnsavedChanges && (
+              <View className="flex-row justify-end gap-3 mt-4 pl-4">
+                <TouchableOpacity
+                  onPress={discardChanges}
+                  className="px-4 py-2 rounded-lg"
+                  style={{ backgroundColor: colors.active + "20" }}
+                >
+                  <Animated.Text
+                    className="font-medium"
+                    style={animatedSecondaryTextStyle}
+                  >
+                    Discard
+                  </Animated.Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={saveChanges}
+                  className="px-4 py-2 rounded-lg"
+                  style={{ backgroundColor: colors.active }}
+                >
+                  <Animated.Text className="font-medium text-white">
+                    Save Changes
+                  </Animated.Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         )}
       </View>

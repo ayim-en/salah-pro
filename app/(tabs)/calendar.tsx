@@ -23,13 +23,15 @@ import {
 } from "@/utils/calendarHelpers";
 import { useNavigation } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Easing, Pressable, View } from "react-native";
+import { Animated, Dimensions, Easing, Pressable, View } from "react-native";
 import Reanimated from "react-native-reanimated";
 import { AnimatedTintIcon } from "@/components/AnimatedTintIcon";
 import {
   useAnimatedBackgroundColor,
   useAnimatedTextColor,
 } from "@/hooks/useAnimatedColor";
+
+const { width } = Dimensions.get("window");
 
 // Animation constants
 const ANIMATION_DURATION_IN = 250;
@@ -42,6 +44,7 @@ export default function CalendarScreen() {
   );
   const [isHolidaySheetOpen, setIsHolidaySheetOpen] = useState(false);
   const [sheetHolidays, setSheetHolidays] = useState<string[]>([]);
+  const [isReady, setIsReady] = useState(false);
   const { colors, themePrayer, isDarkMode } = useThemeColors();
   const { settings: calendarSettings, loading: calendarSettingsLoading } = useCalendarSettings();
   const bgColor = isDarkMode
@@ -75,6 +78,15 @@ export default function CalendarScreen() {
 
     return unsubscribe;
   }, [navigation, scrollToToday]);
+
+  // Defer heavy calendar rendering until after initial paint
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, []);
 
   // Use theme prayer if set, otherwise use actual current prayer for background (null if not loaded yet)
   const displayPrayer = themePrayer || currentPrayer?.prayer;
@@ -203,14 +215,21 @@ export default function CalendarScreen() {
               </Reanimated.View>
             </Pressable>
           </Animated.View>
-          <CalendarCard
-            ref={calendarRef}
-            selectedDate={selectedDate}
-            onDayPress={(day) => setSelectedDate(day.dateString)}
-            holidayMarks={holidayMarks}
-            colors={colors}
-            isDarkMode={isDarkMode}
-          />
+          {isReady ? (
+            <CalendarCard
+              ref={calendarRef}
+              selectedDate={selectedDate}
+              onDayPress={(day) => setSelectedDate(day.dateString)}
+              holidayMarks={holidayMarks}
+              colors={colors}
+              isDarkMode={isDarkMode}
+            />
+          ) : (
+            <Reanimated.View
+              className="rounded-3xl overflow-hidden items-center justify-center"
+              style={[{ width: width, height: width }, animatedBgStyle]}
+            />
+          )}
         </View>
       </View>
 

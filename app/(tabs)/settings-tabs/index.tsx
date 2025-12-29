@@ -52,7 +52,7 @@ type PickerType = "method" | "school" | "latitude" | "tune" | "calendarMethod";
 export default function SettingsHome() {
   const { colors, isDarkMode, currentPrayer, themePrayer, setThemePrayer } =
     useThemeColors();
-  const { settings, updateSettings, updateTune } = usePrayerSettings();
+  const { settings, updateSettings, updateAllTune } = usePrayerSettings();
   const { settings: calendarSettings, updateSettings: updateCalendarSettings } =
     useCalendarSettings();
   const { masterToggle, toggleMasterNotifications } = useNotificationSettings();
@@ -125,7 +125,7 @@ export default function SettingsHome() {
             <PrayerTimesSettings
               settings={settings}
               updateSettings={updateSettings}
-              updateTune={updateTune}
+              updateAllTune={updateAllTune}
               expandedPickers={expandedPickers as Set<string>}
               togglePicker={togglePicker as (picker: string) => void}
               colors={colors}

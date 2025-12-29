@@ -13,6 +13,7 @@ interface PrayerSettingsContextType {
   settings: PrayerSettings;
   updateSettings: (newSettings: Partial<PrayerSettings>) => Promise<void>;
   updateTune: (prayer: TunablePrayer, minutes: number) => Promise<void>;
+  updateAllTune: (tune: Record<TunablePrayer, number>) => Promise<void>;
   loading: boolean;
 }
 
@@ -75,9 +76,20 @@ export const PrayerSettingsProvider: React.FC<{
     }
   };
 
+  // Update all tune values at once (for batch saves)
+  const updateAllTune = async (tune: Record<TunablePrayer, number>) => {
+    try {
+      const updated = { ...settings, tune };
+      setSettings(updated);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch (error) {
+      console.error("Error saving tune settings:", error);
+    }
+  };
+
   return (
     <PrayerSettingsContext.Provider
-      value={{ settings, updateSettings, updateTune, loading }}
+      value={{ settings, updateSettings, updateTune, updateAllTune, loading }}
     >
       {children}
     </PrayerSettingsContext.Provider>
