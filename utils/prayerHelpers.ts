@@ -2,6 +2,51 @@ import { Prayers } from "@/constants/prayers";
 import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
 import { getLocalISODate } from "@/utils/calendarHelpers";
 
+// Hijri month names
+const HIJRI_MONTHS = [
+  "Muharram",
+  "Safar",
+  "Rabi' al-Awwal",
+  "Rabi' al-Thani",
+  "Jumada al-Awwal",
+  "Jumada al-Thani",
+  "Rajab",
+  "Sha'ban",
+  "Ramadan",
+  "Shawwal",
+  "Dhul Qa'dah",
+  "Dhul Hijjah",
+];
+
+// Hijri weekday names (Sunday = 0)
+const HIJRI_WEEKDAYS = [
+  "Al-Ahad",
+  "Al-Ithnayn",
+  "Ath-Thulatha",
+  "Al-Arba'a",
+  "Al-Khamis",
+  "Al-Jumu'ah",
+  "As-Sabt",
+];
+
+// Formats Hijri DD-MM-YYYY date string to "Al-Ithnayn, 9 Rajab" format
+// Optionally accepts ISO date to include weekday
+export const formatHijriDateShort = (hijriDate: string, isoDate?: string): string => {
+  const [dayStr, monthStr] = hijriDate.split("-");
+  const day = Number(dayStr);
+  const monthIndex = Number(monthStr) - 1;
+  const monthName = HIJRI_MONTHS[monthIndex] || "Unknown";
+
+  if (isoDate) {
+    const [year, month, dayOfMonth] = isoDate.split("-").map(Number);
+    const date = new Date(year, month - 1, dayOfMonth);
+    const weekday = HIJRI_WEEKDAYS[date.getDay()];
+    return `${weekday}, ${day} ${monthName}`;
+  }
+
+  return `${day} ${monthName}`;
+};
+
 // Formats DD-MM-YYYY date string for display (local time)
 export const formatHijriDate = (ddmmyyyyDate: string): string => {
   const [dayStr, monthStr, yearStr] = ddmmyyyyDate.split("-");

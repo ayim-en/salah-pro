@@ -106,6 +106,80 @@ export const CalendarSettingsComponent = ({
         )}
       </View>
 
+      <Animated.View className="my-2" style={[{ height: 1 }, animatedSeparatorStyle]} />
+
+      {/* Date Format Toggle */}
+      <View>
+        <TouchableOpacity
+          onPress={() => togglePicker("dateFormat")}
+          className="flex-row items-center py-2"
+        >
+          <View className="flex-1">
+            <Animated.Text
+              className="text-base font-medium"
+              style={animatedTextStyle}
+            >
+              Date Format
+            </Animated.Text>
+            <Animated.Text
+              className="text-sm"
+              style={animatedActiveTextStyle}
+            >
+              {settings.carouselDateFormat === "hijri" ? "Hijri" : "Gregorian"}
+            </Animated.Text>
+          </View>
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  rotate: expandedPickers.has("dateFormat")
+                    ? "180deg"
+                    : "0deg",
+                },
+              ],
+            }}
+          >
+            <AnimatedTintIcon
+              source={require("../assets/images/prayer-pro-icons/settings-tab/settings-dropdown.png")}
+              size={16}
+              tintColor={colors.active}
+            />
+          </Animated.View>
+        </TouchableOpacity>
+        {expandedPickers.has("dateFormat") && (
+          <View className="mt-1">
+            {[
+              { id: "gregorian", name: "Gregorian" },
+              { id: "hijri", name: "Hijri" },
+            ].map((format) => {
+              const isSelected = settings.carouselDateFormat === format.id;
+              return (
+                <TouchableOpacity
+                  key={format.id}
+                  onPress={() => {
+                    updateSettings({ carouselDateFormat: format.id as "gregorian" | "hijri" });
+                    togglePicker("dateFormat");
+                  }}
+                  className="flex-row items-center py-2 pl-4"
+                >
+                  <Animated.Text
+                    className="flex-1"
+                    style={isSelected ? animatedActiveTextStyle : animatedSecondaryTextStyle}
+                  >
+                    {format.name}
+                  </Animated.Text>
+                  {isSelected && (
+                    <Animated.Text style={animatedActiveTextStyle}>
+                      ✓
+                    </Animated.Text>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+      </View>
+
       {/* Day Adjustment (only for MATHEMATICAL method) */}
       {settings.calendarMethod === "MATHEMATICAL" && (
         <>

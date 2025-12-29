@@ -206,8 +206,13 @@ export default function SettingsHome() {
         {
           id: "our-mission-content",
           content: (
-            <Animated.Text style={animatedSecondaryTextStyle}>
-              Our mission coming soon...
+            <Animated.Text
+              className="text-base leading-6"
+              style={animatedSecondaryTextStyle}
+            >
+              Fardh simplifies Islamic daily prayer through modern, minimalist
+              design. We are committed to an ad-free experience that never
+              tracks or sells your personal data.
             </Animated.Text>
           ),
         },
@@ -236,9 +241,65 @@ export default function SettingsHome() {
         {
           id: "privacy-policy-content",
           content: (
-            <Animated.Text style={animatedSecondaryTextStyle}>
-              Privacy policy coming soon...
-            </Animated.Text>
+            <View className="gap-4">
+              <Animated.Text
+                className="text-base leading-6"
+                style={animatedSecondaryTextStyle}
+              >
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedTextStyle}
+                >
+                  Location Data{"\n"}
+                </Animated.Text>
+                Fardh uses your device's location solely to calculate accurate
+                prayer times and Qibla direction for your area. Your location is
+                sent to aladhan.com to fetch prayer times. We do not store your
+                location data.
+              </Animated.Text>
+              <Animated.Text
+                className="text-base leading-6"
+                style={animatedSecondaryTextStyle}
+              >
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedTextStyle}
+                >
+                  Local Storage{"\n"}
+                </Animated.Text>
+                Your preferences (theme, calculation method, notifications) are
+                stored locally on your device. This data never leaves your
+                phone.
+              </Animated.Text>
+              <Animated.Text
+                className="text-base leading-6"
+                style={animatedSecondaryTextStyle}
+              >
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedTextStyle}
+                >
+                  No Tracking{"\n"}
+                </Animated.Text>
+                Fardh contains no analytics, advertising SDKs, or third-party
+                trackers. We do not collect, sell, or share any personal
+                information.
+              </Animated.Text>
+              <Animated.Text
+                className="text-base leading-6"
+                style={animatedSecondaryTextStyle}
+              >
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedTextStyle}
+                >
+                  Third-Party Services{"\n"}
+                </Animated.Text>
+                Prayer times and Islamic calendar data are provided by
+                aladhan.com. Please refer to their privacy policy for
+                information on how they handle requests.
+              </Animated.Text>
+            </View>
           ),
         },
       ],

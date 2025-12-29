@@ -32,10 +32,13 @@ export const CALENDAR_METHODS: CalendarMethodOption[] = [
   },
 ];
 
+export type CarouselDateFormat = "gregorian" | "hijri";
+
 // Default settings
 export const DEFAULT_CALENDAR_SETTINGS = {
   calendarMethod: "HJCoSA" as CalendarMethodId,
   adjustment: 0,
+  carouselDateFormat: "gregorian" as CarouselDateFormat,
 };
 
 export type CalendarSettings = typeof DEFAULT_CALENDAR_SETTINGS;

@@ -2,6 +2,7 @@ import type { PrayerCarouselRef } from "@/components/PrayerCarousel";
 import { PrayerCarousel } from "@/components/PrayerCarousel";
 import { PrayerHeader } from "@/components/PrayerHeader";
 import { darkModeColors, lightModeColors, prayerThemeColors } from "@/constants/prayers";
+import { useCalendarSettings } from "@/context/CalendarSettingsContext";
 import { useThemeColors } from "@/context/ThemeContext";
 import { useLocation } from "@/hooks/useLocation";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -9,7 +10,7 @@ import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Text, useColorScheme, View } from "react-native";
+import { Text, View } from "react-native";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -17,8 +18,7 @@ export default function Index() {
   const carouselRef = useRef<PrayerCarouselRef>(null);
   const navigation = useNavigation<any>();
   const { themePrayer, isDarkMode } = useThemeColors();
-  const colorScheme = useColorScheme();
-  const systemIsDark = colorScheme === "dark";
+  const { settings: calendarSettings } = useCalendarSettings();
 
   // Custom hooks to get states
   const { location, locationName, error: locationError } = useLocation();
@@ -63,8 +63,8 @@ export default function Index() {
   // Theme uses override if set, otherwise actual current prayer
   const themePrayerDisplay = themePrayer || currentPrayer?.prayer;
 
-  // Use system color scheme for background to match root layout during initial load
-  const bgColor = (isDarkMode || systemIsDark) ? darkModeColors.background : lightModeColors.background;
+  // isDarkMode from context already falls back to system color scheme
+  const bgColor = isDarkMode ? darkModeColors.background : lightModeColors.background;
 
   if (error) return (
     <View className="flex-1 m-4" style={{ backgroundColor: bgColor }}>
@@ -102,7 +102,7 @@ export default function Index() {
             : "#8398a3"
         }
         currentPrayer={currentPrayer?.prayer || null}
-        isDarkMode={isDarkMode || systemIsDark}
+        dateFormat={calendarSettings.carouselDateFormat}
       />
     </View>
   );

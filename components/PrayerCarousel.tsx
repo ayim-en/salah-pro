@@ -1,13 +1,17 @@
+import { CarouselDateFormat } from "@/constants/calendarSettings";
 import {
   Prayers,
   darkModeColors,
   lightModeColors,
   prayerIcons,
 } from "@/constants/prayers";
+import { useThemeColors } from "@/context/ThemeContext";
+import { useAnimatedBackgroundColor, useAnimatedTextColor } from "@/hooks/useAnimatedColor";
 import { PrayerDict } from "@/prayer-api/prayerTimesAPI";
-import { cleanTimeString, formatDate } from "@/utils/prayerHelpers";
+import { cleanTimeString, formatDate, formatHijriDateShort } from "@/utils/prayerHelpers";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import { Dimensions, Pressable, Text, Vibration, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { Carousel } from "react-native-ui-lib";
 import { AnimatedTintIcon } from "./AnimatedTintIcon";
 
@@ -28,7 +32,7 @@ interface PrayerCarouselProps {
   activeColor: string;
   inactiveColor: string;
   currentPrayer: string | null;
-  isDarkMode?: boolean;
+  dateFormat?: CarouselDateFormat;
 }
 
 export type PrayerCarouselRef = {
@@ -52,19 +56,20 @@ export const PrayerCarousel = forwardRef<
       activeColor,
       inactiveColor,
       currentPrayer,
-      isDarkMode = false,
+      dateFormat = "gregorian",
     },
     ref
   ) => {
     type CarouselHandle = React.ComponentRef<typeof Carousel>;
     const carouselRef = useRef<CarouselHandle | null>(null);
+    const { isDarkMode } = useThemeColors();
 
     useImperativeHandle(ref, () => ({
       goToPage: (page, animated = true) =>
         carouselRef.current?.goToPage?.(page, animated),
     }));
 
-    // Colors based on dark mode
+    // Colors based on dark mode - use same logic as PrayerHeader
     const bgColor = isDarkMode
       ? darkModeColors.background
       : lightModeColors.background;
@@ -76,17 +81,22 @@ export const PrayerCarousel = forwardRef<
       ? darkModeColors.textTertiary
       : lightModeColors.textTertiary;
 
+    // Animated styles for smooth transitions
+    const animatedBgStyle = useAnimatedBackgroundColor(bgColor);
+    const animatedTextStyle = useAnimatedTextColor(textColor);
+    const animatedSecondaryTextStyle = useAnimatedTextColor(secondaryTextColor);
+    const animatedTertiaryTextStyle = useAnimatedTextColor(tertiaryTextColor);
+
     return (
-      <View
+      <Animated.View
         className="flex-1 pt-8 pb-2 items-center mt-[22rem] rounded-t-3xl"
-        style={{ backgroundColor: bgColor }}
+        style={animatedBgStyle}
       >
         <View
           className="relative"
           style={{
             width: pageWidth + itemSpacing,
             height: pageHeight,
-            backgroundColor: bgColor,
           }}
         >
           <Carousel
@@ -94,7 +104,6 @@ export const PrayerCarousel = forwardRef<
             containerStyle={{
               height: pageHeight,
               width: pageWidth + itemSpacing,
-              backgroundColor: bgColor,
             }}
             pageWidth={pageWidth}
             onChangePage={onPageChange}
@@ -110,24 +119,30 @@ export const PrayerCarousel = forwardRef<
                   key={isoDate}
                   className="w-full h-full rounded-xl justify-start"
                 >
-                  <View className="mb-2">
-                    <Text
-                      style={{
-                        fontSize: 24,
-                        fontWeight: "bold",
-                        color: textColor,
-                      }}
-                    >
-                      {formatDate(isoDate)}
-                    </Text>
-                    {isToday && (
-                      <Text
-                        className="text-sm font-semibold mt-1"
-                        style={{ color: activeColor }}
+                  <View className="mb-2 flex-row justify-between items-start">
+                    <View>
+                      <Animated.Text
+                        style={[
+                          {
+                            fontSize: 24,
+                            fontWeight: "bold",
+                          },
+                          animatedTextStyle,
+                        ]}
                       >
-                        TODAY
-                      </Text>
-                    )}
+                        {dateFormat === "hijri"
+                          ? formatHijriDateShort(dayPrayers.hijriDate, isoDate)
+                          : formatDate(isoDate)}
+                      </Animated.Text>
+                      {isToday && (
+                        <Text
+                          className="text-sm font-semibold mt-1"
+                          style={{ color: activeColor }}
+                        >
+                          TODAY
+                        </Text>
+                      )}
+                    </View>
                   </View>
 
                   <View className="flex-1 justify-around">
@@ -146,22 +161,24 @@ export const PrayerCarousel = forwardRef<
                                 : inactiveColor
                             }
                           />
-                          <Text
-                            style={{
-                              fontSize: 18,
-                              fontWeight: "600",
-                              color: secondaryTextColor,
-                            }}
+                          <Animated.Text
+                            style={[
+                              {
+                                fontSize: 18,
+                                fontWeight: "600",
+                              },
+                              animatedSecondaryTextStyle,
+                            ]}
                           >
                             {prayer}
-                          </Text>
+                          </Animated.Text>
                         </View>
                         <View className="flex-row items-center gap-4">
-                          <Text
-                            style={{ fontSize: 18, color: tertiaryTextColor }}
+                          <Animated.Text
+                            style={[{ fontSize: 18 }, animatedTertiaryTextStyle]}
                           >
                             {cleanTimeString(dayPrayers.timings[prayer])}
-                          </Text>
+                          </Animated.Text>
                           <Pressable
                             onPress={() => {
                               onToggleNotification(prayer);
@@ -191,7 +208,7 @@ export const PrayerCarousel = forwardRef<
             })}
           </Carousel>
         </View>
-      </View>
+      </Animated.View>
     );
   }
 );

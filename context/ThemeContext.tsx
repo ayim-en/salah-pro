@@ -1,5 +1,9 @@
 import { Prayer, prayerThemeColors } from "@/constants/prayers";
-import React, { createContext, useContext, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useColorScheme } from "react-native";
+
+const THEME_STORAGE_KEY = "themePrayer";
 
 interface ThemeColors {
   active: string;
@@ -26,6 +30,9 @@ const DARK_MODE_PRAYERS: Prayer[] = ["Maghrib", "Isha"];
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const colorScheme = useColorScheme();
+  const systemIsDark = colorScheme === "dark";
+
   const [colors, setColors] = useState<ThemeColors>({
     active: "#568FAF",
     inactive: "#8398a3",
@@ -33,22 +40,58 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Theme override: allow manual selection of prayer theme
   const [themePrayer, setThemePrayer] = useState<Prayer | null>(null);
+  const [themeLoaded, setThemeLoaded] = useState(false);
 
   // Track the current prayer for dark mode calculation
   const [currentPrayer, setCurrentPrayer] = useState<Prayer | null>(null);
 
+  // Load saved theme from AsyncStorage on mount
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const saved = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+        if (saved) {
+          setThemePrayer(saved as Prayer);
+        }
+      } catch (error) {
+        console.error("Error loading theme:", error);
+      } finally {
+        setThemeLoaded(true);
+      }
+    };
+    loadTheme();
+  }, []);
+
+  // Save theme to AsyncStorage when it changes
+  useEffect(() => {
+    if (!themeLoaded) return; // Don't save during initial load
+    const saveTheme = async () => {
+      try {
+        if (themePrayer) {
+          await AsyncStorage.setItem(THEME_STORAGE_KEY, themePrayer);
+        } else {
+          await AsyncStorage.removeItem(THEME_STORAGE_KEY);
+        }
+      } catch (error) {
+        console.error("Error saving theme:", error);
+      }
+    };
+    saveTheme();
+  }, [themePrayer, themeLoaded]);
+
   // Calculate dark mode based on theme prayer or current prayer
+  // Falls back to system color scheme when no prayer is loaded
   const activePrayer = themePrayer || currentPrayer;
   const isDarkMode = activePrayer
     ? DARK_MODE_PRAYERS.includes(activePrayer)
-    : false;
+    : systemIsDark;
 
   // Override colors when themePrayer is set
-  const effectiveSetColors = (newColors: ThemeColors) => {
+  const effectiveSetColors = useCallback((newColors: ThemeColors) => {
     if (!themePrayer) {
       setColors(newColors);
     }
-  };
+  }, [themePrayer]);
 
   // Apply theme prayer colors when themePrayer changes
   React.useEffect(() => {

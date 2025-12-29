@@ -6,14 +6,12 @@ import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
 import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
-import { useColorScheme } from "react-native";
 import Animated from "react-native-reanimated";
 
 function TabBarBackground() {
   const { isDarkMode } = useThemeColors();
-  const colorScheme = useColorScheme();
-  const systemIsDark = colorScheme === "dark";
-  const bgColor = (isDarkMode || systemIsDark)
+  // isDarkMode from context already falls back to system color scheme
+  const bgColor = isDarkMode
     ? darkModeColors.background
     : lightModeColors.background;
   const animatedBgStyle = useAnimatedBackgroundColor(bgColor);
@@ -32,10 +30,9 @@ export default function TabLayout() {
   const { colors, setColors, themePrayer, setCurrentPrayer, isDarkMode } = useThemeColors();
   const { location } = useLocation();
   const { currentPrayer } = usePrayerTimes(location);
-  const colorScheme = useColorScheme();
-  const systemIsDark = colorScheme === "dark";
 
-  const bgColor = (isDarkMode || systemIsDark) ? darkModeColors.background : lightModeColors.background;
+  // isDarkMode from context already falls back to system color scheme
+  const bgColor = isDarkMode ? darkModeColors.background : lightModeColors.background;
 
   // Update theme colors based on current prayer (only if no theme override is set)
   useEffect(() => {
