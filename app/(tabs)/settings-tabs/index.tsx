@@ -19,6 +19,7 @@ import {
 } from "@/hooks/useAnimatedColor";
 import React, { useCallback, useState } from "react";
 import {
+  Linking,
   Platform,
   Pressable,
   SectionList,
@@ -199,26 +200,6 @@ export default function SettingsHome() {
       ],
     },
     {
-      id: "our-mission",
-      title: "Our Mission",
-      icon: require("../../../assets/images/prayer-pro-icons/settings-tab/settings-mission.png"),
-      data: [
-        {
-          id: "our-mission-content",
-          content: (
-            <Animated.Text
-              className="text-base leading-6"
-              style={animatedSecondaryTextStyle}
-            >
-              Fardh simplifies Islamic daily prayer through modern, minimalist
-              design. We are committed to an ad-free experience that never
-              tracks or sells your personal data.
-            </Animated.Text>
-          ),
-        },
-      ],
-    },
-    {
       id: "about",
       title: "About",
       icon: require("../../../assets/images/prayer-pro-icons/settings-tab/settings-about.png"),
@@ -226,9 +207,117 @@ export default function SettingsHome() {
         {
           id: "about-content",
           content: (
-            <Animated.Text style={animatedSecondaryTextStyle}>
-              About information coming soon...
-            </Animated.Text>
+            <View className="gap-4">
+              <Animated.Text
+                className="text-base leading-6"
+                style={animatedSecondaryTextStyle}
+              >
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedTextStyle}
+                >
+                  Our Mission{"\n"}
+                </Animated.Text>
+                Fardh simplifies Islamic daily prayer through modern, minimalist
+                design. We are committed to an ad-free experience that never
+                sells or shares your personal data.
+              </Animated.Text>
+              <View>
+                <View className="flex-row items-center gap-2 mb-1">
+                  <Animated.Text
+                    className="font-semibold text-base"
+                    style={animatedTextStyle}
+                  >
+                    Ayimen Hussien
+                  </Animated.Text>
+                  <Pressable
+                    onPress={() =>
+                      Linking.openURL("https://www.linkedin.com/in/ayim-en/")
+                    }
+                  >
+                    <AnimatedTintIcon
+                      source={require("../../../assets/images/prayer-pro-icons/settings-tab/about-linkedin.png")}
+                      size={18}
+                      tintColor={colors.active}
+                    />
+                  </Pressable>
+                  <Pressable
+                    onPress={() =>
+                      Linking.openURL("https://github.com/ayim-en")
+                    }
+                  >
+                    <AnimatedTintIcon
+                      source={require("../../../assets/images/prayer-pro-icons/settings-tab/about-github.png")}
+                      size={18}
+                      tintColor={colors.active}
+                    />
+                  </Pressable>
+                </View>
+                <Animated.Text
+                  className="text-base leading-6"
+                  style={animatedSecondaryTextStyle}
+                >
+                  Current senior at Seattle University studying Computer Science
+                  with aspirations of becoming a Software Engineer.
+                </Animated.Text>
+              </View>
+              <View>
+                <View className="flex-row items-center gap-2 mb-1">
+                  <Animated.Text
+                    className="font-semibold text-base"
+                    style={animatedTextStyle}
+                  >
+                    Abdulnasser Hussien
+                  </Animated.Text>
+                  <Pressable
+                    onPress={() =>
+                      Linking.openURL(
+                        "https://www.linkedin.com/in/abdulnasserhussien/"
+                      )
+                    }
+                  >
+                    <AnimatedTintIcon
+                      source={require("../../../assets/images/prayer-pro-icons/settings-tab/about-linkedin.png")}
+                      size={18}
+                      tintColor={colors.active}
+                    />
+                  </Pressable>
+                </View>
+                <Animated.Text
+                  className="text-base leading-6"
+                  style={animatedSecondaryTextStyle}
+                >
+                  Current senior at the University of Washington studying
+                  Management Information Systems with the hopes of becoming a
+                  Product Manager.
+                </Animated.Text>
+              </View>
+              <Animated.Text
+                className="text-base leading-6"
+                style={animatedSecondaryTextStyle}
+              >
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedTextStyle}
+                >
+                  Source Code{"\n"}
+                </Animated.Text>
+                This is an open source project hosted on GitHub. Feel free to
+                take a look{" "}
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedActiveTextStyle}
+                  onPress={() =>
+                    Linking.openURL(
+                      "https://github.com/ayim-en/fardh-islamic-prayer-app"
+                    )
+                  }
+                >
+                  here
+                </Animated.Text>
+                !
+              </Animated.Text>
+            </View>
           ),
         },
       ],
@@ -252,10 +341,17 @@ export default function SettingsHome() {
                 >
                   Location Data{"\n"}
                 </Animated.Text>
-                Fardh uses your device's location solely to calculate accurate
-                prayer times and Qibla direction for your area. Your location is
-                sent to aladhan.com to fetch prayer times. We do not store your
-                location data.
+                Fardh uses your device&apos;s location solely to calculate
+                accurate prayer times and Qibla direction for your area. Your
+                location is sent to{" "}
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedActiveTextStyle}
+                  onPress={() => Linking.openURL("https://aladhan.com/")}
+                >
+                  aladhan.com
+                </Animated.Text>{" "}
+                to fetch prayer times. We do not store your location data.
               </Animated.Text>
               <Animated.Text
                 className="text-base leading-6"
@@ -279,11 +375,10 @@ export default function SettingsHome() {
                   className="font-semibold"
                   style={animatedTextStyle}
                 >
-                  No Tracking{"\n"}
+                  Sharing & Tracking{"\n"}
                 </Animated.Text>
-                Fardh contains no analytics, advertising SDKs, or third-party
-                trackers. We do not collect, sell, or share any personal
-                information.
+                Fardh contains no advertising SDKs or third-party trackers. We
+                do not sell or share any personal information.
               </Animated.Text>
               <Animated.Text
                 className="text-base leading-6"
@@ -295,9 +390,16 @@ export default function SettingsHome() {
                 >
                   Third-Party Services{"\n"}
                 </Animated.Text>
-                Prayer times and Islamic calendar data are provided by
-                aladhan.com. Please refer to their privacy policy for
-                information on how they handle requests.
+                Prayer times and Islamic calendar data are provided by{" "}
+                <Animated.Text
+                  className="font-semibold"
+                  style={animatedActiveTextStyle}
+                  onPress={() => Linking.openURL("https://aladhan.com/")}
+                >
+                  aladhan.com
+                </Animated.Text>
+                . Please refer to their privacy policy for information on how
+                they handle requests.
               </Animated.Text>
             </View>
           ),
