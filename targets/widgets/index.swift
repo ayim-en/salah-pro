@@ -27,7 +27,7 @@ struct PrayerData: Codable {
 // MARK: - Timeline Provider
 
 struct PrayerTimelineProvider: TimelineProvider {
-    let appGroupId = "group.com.ayimen.salah-pro"
+    let appGroupId = "group.com.ayimen.fardh"
 
     private static let defaultPrayerData = PrayerData(
         fajr: "--:--",

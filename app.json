@@ -1,23 +1,25 @@
 {
   "expo": {
-    "name": "salah-pro",
-    "slug": "salah-pro",
+    "name": "Fardh",
+    "slug": "fardh",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "salah-pro",
+    "scheme": "fardh",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ayimen.salah-pro",
+      "bundleIdentifier": "com.ayimen.fardh",
       "appleTeamId": "UCA6F7FD9U",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show accurate prayer times for your area."
       },
       "entitlements": {
-        "com.apple.security.application-groups": ["group.com.ayimen.salah-pro"]
+        "com.apple.security.application-groups": [
+          "group.com.ayimen.fardh"
+        ]
       }
     },
     "android": {
@@ -29,10 +31,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ayimen.salahpro",
+      "package": "com.ayimen.fardh",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
@@ -57,13 +61,13 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow Salah Pro to use your location to show accurate prayer times for your area.",
+          "locationAlwaysAndWhenInUsePermission": "Allow Fardh to use your location to show accurate prayer times for your area.",
           "isIosBackgroundLocationEnabled": false,
           "isAndroidBackgroundLocationEnabled": false
         }
       ],
       "@bacons/apple-targets"
-    ], 
+    ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
@@ -71,8 +75,26 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "ef871a57-a6c2-489a-b422-9d5ce2e820ba"
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "bundleIdentifier": "com.ayimen.fardh.widget",
+                  "targetName": "PrayerWidgets",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.ayimen.fardh"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "199db2c6-437d-4c35-9d9c-4c42d51469a0"
       }
-    }
+    },
+    "owner": "ayim-en"
   }
 }

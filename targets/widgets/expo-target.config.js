@@ -6,7 +6,7 @@ module.exports = {
   deploymentTarget: "17.0",
   frameworks: ["SwiftUI", "WidgetKit"],
   entitlements: {
-    "com.apple.security.application-groups": ["group.com.ayimen.salah-pro"],
+    "com.apple.security.application-groups": ["group.com.ayimen.fardh"],
   },
   colors: {
     AccentColor: {

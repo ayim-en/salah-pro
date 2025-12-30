@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 
 // App Group identifier for sharing data with widgets
-const APP_GROUP = "group.com.ayimen.salah-pro";
+const APP_GROUP = "group.com.ayimen.fardh";
 const PRAYER_TIMES_KEY = "prayerTimes";
 
 // Import the native module conditionally for iOS
