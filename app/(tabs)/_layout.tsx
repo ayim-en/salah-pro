@@ -4,6 +4,8 @@ import { useThemeColors } from "@/context/ThemeContext";
 import { useAnimatedBackgroundColor } from "@/hooks/useAnimatedColor";
 import { useLocation } from "@/hooks/useLocation";
 import { usePrayerTimes } from "@/hooks/usePrayerTimes";
+import { formatTime12Hour } from "@/utils/prayerHelpers";
+import { updateWidgetPrayerTimes } from "@/utils/widgetStorage";
 import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
 import Animated from "react-native-reanimated";
@@ -28,8 +30,8 @@ function TabBarBackground() {
 
 export default function TabLayout() {
   const { colors, setColors, themePrayer, setCurrentPrayer, isDarkMode } = useThemeColors();
-  const { location } = useLocation();
-  const { currentPrayer } = usePrayerTimes(location);
+  const { location, locationName } = useLocation();
+  const { currentPrayer, prayerDict, todayISO } = usePrayerTimes(location);
 
   // isDarkMode from context already falls back to system color scheme
   const bgColor = isDarkMode ? darkModeColors.background : lightModeColors.background;
@@ -48,6 +50,35 @@ export default function TabLayout() {
       setCurrentPrayer(currentPrayer.prayer as any);
     }
   }, [currentPrayer, setColors, themePrayer, setCurrentPrayer]);
+
+  // Sync prayer times with iOS widget
+  useEffect(() => {
+    const todayPrayers = prayerDict[todayISO];
+    if (todayPrayers?.timings) {
+      // Calculate tomorrow's date for Fajr time
+      const tomorrow = new Date(todayISO);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowISO = tomorrow.toISOString().split("T")[0];
+      const tomorrowPrayers = prayerDict[tomorrowISO];
+
+      updateWidgetPrayerTimes({
+        fajr: formatTime12Hour(todayPrayers.timings.Fajr),
+        sunrise: formatTime12Hour(todayPrayers.timings.Sunrise),
+        dhuhr: formatTime12Hour(todayPrayers.timings.Dhuhr),
+        asr: formatTime12Hour(todayPrayers.timings.Asr),
+        maghrib: formatTime12Hour(todayPrayers.timings.Maghrib),
+        isha: formatTime12Hour(todayPrayers.timings.Isha),
+        tomorrowFajr: tomorrowPrayers?.timings?.Fajr
+          ? formatTime12Hour(tomorrowPrayers.timings.Fajr)
+          : null,
+        currentPrayer: currentPrayer?.prayer || null,
+        locationName: locationName || null,
+        lastUpdated: new Date().toISOString(),
+        accentColor: colors.active,
+        isDarkMode: isDarkMode,
+      });
+    }
+  }, [prayerDict, todayISO, currentPrayer, locationName, colors, isDarkMode]);
 
   return (
     <Tabs

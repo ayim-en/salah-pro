@@ -11,9 +11,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ayimen.salah-pro",
+      "appleTeamId": "UCA6F7FD9U",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show accurate prayer times for your area."
+      },
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.com.ayimen.salah-pro"]
       }
     },
     "android": {
@@ -57,7 +61,8 @@
           "isIosBackgroundLocationEnabled": false,
           "isAndroidBackgroundLocationEnabled": false
         }
-      ]
+      ],
+      "@bacons/apple-targets"
     ], 
     "experiments": {
       "typedRoutes": true,

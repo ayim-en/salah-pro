@@ -82,6 +82,18 @@ export const cleanTimeString = (timeString: string): string => {
   return timeString.split(" ")[0]; // e.g., "05:30 (GMT)" -> "05:30"
 };
 
+// Converts 24-hour time string to 12-hour format with AM/PM
+export const formatTime12Hour = (timeString: string): string => {
+  const cleanTime = cleanTimeString(timeString);
+  const [hoursStr, minutesStr] = cleanTime.split(":");
+  let hours = parseInt(hoursStr, 10);
+  const minutes = minutesStr;
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 should be 12
+  return `${hours}:${minutes} ${ampm}`;
+};
+
 // Parses prayer time string to Date object for a given ISO date
 export const parsePrayerTime = (isoDate: string, timeString: string): Date => {
   const cleanTime = cleanTimeString(timeString);

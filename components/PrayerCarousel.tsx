@@ -124,7 +124,7 @@ export const PrayerCarousel = forwardRef<
                       <Animated.Text
                         style={[
                           {
-                            fontSize: 24,
+                            fontSize: 18,
                             fontWeight: "bold",
                           },
                           animatedTextStyle,
